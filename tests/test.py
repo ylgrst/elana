@@ -32,4 +32,4 @@ def test_read_from_mesh_file_must_return_tensor_with_only_ones(tmp_matrix_txt_fi
 
     # Assert
 
-    assert (stiffness_tensor == 1.0).all()
+    assert (stiffness_tensor.matrix == 1.0).all()
