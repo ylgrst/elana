@@ -2,6 +2,7 @@ import numpy as np
 import math as m
 from typing import Callable
 from scipy import optimize
+import numpy.typing as npt
 
 def compute_direction_vector_spherical_to_cartesian(theta : float, phi : float, chi : float = None) -> list[float]:
     if chi is None:
