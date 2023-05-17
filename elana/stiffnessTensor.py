@@ -1,7 +1,7 @@
 import numpy as np
 import numpy.typing as npt
 from operations import compute_direction_vector_spherical_to_cartesian
-import math as m
+from scipy import optimize
 
 _VOIGT_MATRIX: npt.NDArray[int] = np.array([0, 5, 4], [5, 1, 3], [4, 3, 2])
 
@@ -104,26 +104,80 @@ class StiffnessTensor:
         return result_numerator / result_denominator
 
     def voigt_averages(self) -> list[float]:
-        tmpA = (self.matrix[0][0] + self.matrix[1][1] + self.matrix[2][2])/3
-        tmpB = (self.matrix[1][2] + self.matrix[0][2] + self.matrix[0][1])/3
-        tmpC = (self.matrix[3][3] + self.matrix[4][4] + self.matrix[5][5])/3
+        tmpA = (self.matrix[0][0] + self.matrix[1][1] + self.matrix[2][2]) / 3
+        tmpB = (self.matrix[1][2] + self.matrix[0][2] + self.matrix[0][1]) / 3
+        tmpC = (self.matrix[3][3] + self.matrix[4][4] + self.matrix[5][5]) / 3
 
-        bulk_modulus = (tmpA + 2*tmpB)/3
-        shear_modulus = (tmpA - tmpB + 3*tmpC)/5
-        young_modulus = 1/(1/(3*shear_modulus) + 1/(9*bulk_modulus))
-        poisson_ratio = (1 - 3*shear_modulus/(3*bulk_modulus+shear_modulus))/2
+        bulk_modulus = (tmpA + 2 * tmpB) / 3
+        shear_modulus = (tmpA - tmpB + 3 * tmpC) / 5
+        young_modulus = 1 / (1 / (3 * shear_modulus) + 1 / (9 * bulk_modulus))
+        poisson_ratio = (1 - 3 * shear_modulus / (3 * bulk_modulus + shear_modulus)) / 2
 
         return [bulk_modulus, shear_modulus, young_modulus, poisson_ratio]
 
     def reuss_averages(self) -> list[float]:
-        tmpA = (self.flexibility_matrix[0][0] + self.flexibility_matrix[1][1] + self.flexibility_matrix[2][2])/3
-        tmpB = (self.flexibility_matrix[1][2] + self.flexibility_matrix[0][2] + self.flexibility_matrix[0][1])/3
-        tmpC = (self.flexibility_matrix[3][3] + self.flexibility_matrix[4][4] + self.flexibility_matrix[5][5])/3
+        tmpA = (self.flexibility_matrix[0][0] + self.flexibility_matrix[1][1] + self.flexibility_matrix[2][2]) / 3
+        tmpB = (self.flexibility_matrix[1][2] + self.flexibility_matrix[0][2] + self.flexibility_matrix[0][1]) / 3
+        tmpC = (self.flexibility_matrix[3][3] + self.flexibility_matrix[4][4] + self.flexibility_matrix[5][5]) / 3
 
-        bulk_modulus = 1/(3*tmpA + 6*tmpB)
-        shear_modulus = 5 / (4*tmpA - 4*tmpB + 3*tmpC)
-        young_modulus = 1/(1/(3*shear_modulus) + 1/(9*bulk_modulus))
-        poisson_ratio = (1 - 3*shear_modulus/(3*bulk_modulus+shear_modulus))/2
+        bulk_modulus = 1 / (3 * tmpA + 6 * tmpB)
+        shear_modulus = 5 / (4 * tmpA - 4 * tmpB + 3 * tmpC)
+        young_modulus = 1 / (1 / (3 * shear_modulus) + 1 / (9 * bulk_modulus))
+        poisson_ratio = (1 - 3 * shear_modulus / (3 * bulk_modulus + shear_modulus)) / 2
+
+        return [bulk_modulus, shear_modulus, young_modulus, poisson_ratio]
 
     def hill_average(self) -> list[float]:
-        bulk_modulus = (self.voigt_averages()[0] + self.reuss_averages()[0])
+        bulk_modulus = (self.voigt_averages()[0] + self.reuss_averages()[0]) / 2
+        shear_modulus = (self.voigt_averages()[1] + self.reuss_averages()[1]) / 2
+        young_modulus = 1 / (1 / (3 * shear_modulus) + 1 / (9 * bulk_modulus))
+        poisson_ratio = (1 - 3 * shear_modulus / (3 * bulk_modulus + shear_modulus)) / 2
+
+        return [bulk_modulus, shear_modulus, young_modulus, poisson_ratio]
+
+    def shear_2d(self, angles: tuple[float, float]) -> tuple[float, float]:
+        ftol = 0.001
+        xtol = 0.01
+
+        def shear_function(z): return self.shear((angles[0], angles[1], z))
+
+        def minus_shear_function(z): return -self.shear((angles[0], angles[1], z))
+
+        result_pos = optimize.minimize(shear_function, np.pi / 2.0, args=(), method='Powell',
+                                       options={"xtol": xtol, "ftol": ftol})  # , bounds=[(0.0,np.pi)])
+        result_neg = optimize.minimize(minus_shear_function, np.pi / 2.0, args=(), method='Powell',
+                                       options={"xtol": xtol, "ftol": ftol})  # , bounds=[(0.0,np.pi)])
+        return float(result_pos.fun), -float(result_neg.fun)
+
+    def shear_3d(self, angles: tuple[float, float]) -> tuple[float, float, float, float]:
+        tol = 0.005
+        guess = np.pi/2.0
+        def shear_function(z): return self.shear((angles[0], angles[1], z))
+        def minus_shear_function(z): return -self.shear((angles[0], angles[1], z))
+
+        result_pos = optimize.minimize(shear_function, guess, args=(), method='COBYLA', options={"tol": tol})  # , bounds=[(0.0,np.pi)])
+        result_neg = optimize.minimize(minus_shear_function, guess, args=(), method = 'COBYLA', options={"tol":tol})#, bounds=[(0.0,np.pi)])
+
+        return float(result_pos.fun), -float(result_neg.fun), float(result_pos.x), float(result_neg.x)
+
+    def poisson_2d(self, angles : tuple[float, float]) -> tuple[float, float, float]:
+        ftol = 0.001
+        xtol = 0.01
+        def poisson_function(z): return self.poisson((angles[0], angles[1], z))
+        def minus_poisson_function(z): return -self.poisson((angles[0], angles[1], z))
+
+        result_pos = optimize.minimize(poisson_function, np.pi/2.0, args=(), method = 'Powell', options={"xtol":xtol, "ftol":ftol})#, bounds=[(0.0,np.pi)])
+        result_neg = optimize.minimize(minus_poisson_function, np.pi/2.0, args=(), method = 'Powell', options={"xtol":xtol, "ftol":ftol})#, bounds=[(0.0,np.pi)])
+        return min(0.0, float(result_pos.fun)), max(0.0, float(result_pos.fun)), -float(result_neg.fun)
+
+    def poisson_3d(self, angles : tuple[float, float]) -> tuple[float, float, float, float, float]:
+        tol = 0.005
+        guess = np.pi / 2.0
+
+        def poisson_function(z): return self.poisson((angles[0], angles[1], z))
+        def minus_poisson_function(z): return -self.poisson((angles[0], angles[1], z))
+
+        result_pos = optimize.minimize(poisson_function, guess, args=(), method = 'COBYLA', options={"tol":tol})#, bounds=[(0.0,np.pi)])
+        result_neg = optimize.minimize(minus_poisson_function, guess, args=(), method = 'COBYLA', options={"tol":tol})#, bounds=[(0.0,np.pi)])
+
+        return (min(0,float(result_pos.fun)), max(0,float(result_pos.fun)), -float(result_neg.fun), float(result_pos.x), float(result_neg.x))
