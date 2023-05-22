@@ -180,4 +180,4 @@ class StiffnessTensor:
         result_pos = optimize.minimize(poisson_function, guess, args=(), method = 'COBYLA', options={"tol":tol})#, bounds=[(0.0,np.pi)])
         result_neg = optimize.minimize(minus_poisson_function, guess, args=(), method = 'COBYLA', options={"tol":tol})#, bounds=[(0.0,np.pi)])
 
-        return (min(0,float(result_pos.fun)), max(0,float(result_pos.fun)), -float(result_neg.fun), float(result_pos.x), float(result_neg.x))
+        return min(0,float(result_pos.fun)), max(0,float(result_pos.fun)), -float(result_neg.fun), float(result_pos.x), float(result_neg.x)
