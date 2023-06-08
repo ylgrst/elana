@@ -26,6 +26,12 @@ def _symmetrical_colormap(cmap_settings, new_name=None):
 
     return my_map
 
+
+_symmetrical_viridis = _symmetrical_colormap(('viridis', None))
+_symmetrical_blues = _symmetrical_colormap(('Blues', None))
+_symmetrical_greens = _symmetrical_colormap(('Greens', None))
+
+
 def plot_young_3d(stiffness_matrix: StiffnessTensor) -> None:
     """3D plotter for Young modulus"""
 
@@ -34,21 +40,21 @@ def plot_young_3d(stiffness_matrix: StiffnessTensor) -> None:
     theta_array = np.linspace(0, np.pi, n_points)
     phi_array = np.linspace(0, 2 * np.pi, 2 * n_points)
 
-    data_x = np.zeros((n_points, 2*n_points))
-    data_y = np.zeros((n_points, 2*n_points))
-    data_z = np.zeros((n_points, 2*n_points))
-    data_young = np.zeros((n_points, 2*n_points))
+    data_x = np.zeros((n_points, 2 * n_points))
+    data_y = np.zeros((n_points, 2 * n_points))
+    data_z = np.zeros((n_points, 2 * n_points))
+    data_young = np.zeros((n_points, 2 * n_points))
 
     for index_theta in range(len(theta_array)):
         for index_phi in range(len(phi_array)):
             young = stiffness_matrix.young((theta_array[index_theta], phi_array[index_phi]))
-            data_young[index_theta,index_phi] = young
+            data_young[index_theta, index_phi] = young
             z = young * np.cos(theta_array[index_theta])
             x = young * np.sin(theta_array[index_theta]) * np.cos(phi_array[index_phi])
             y = young * np.sin(theta_array[index_theta]) * np.sin(phi_array[index_phi])
-            data_x[index_theta,index_phi] = x
-            data_y[index_theta,index_phi] = y
-            data_z[index_theta,index_phi] = z
+            data_x[index_theta, index_phi] = x
+            data_y[index_theta, index_phi] = y
+            data_z[index_theta, index_phi] = z
 
     young_average = np.average(data_young)
     young_min = np.min(data_young)
@@ -64,7 +70,8 @@ def plot_young_3d(stiffness_matrix: StiffnessTensor) -> None:
     scalarmap = cm.ScalarMappable(cmap='viridis', norm=norm)
     scalarmap.set_clim(young_min, young_max)
 
-    cbar = plt.colorbar(scalarmap, orientation="horizontal", fraction=0.06, pad=-0.1, ticks=[young_min, young_average, young_max])
+    cbar = plt.colorbar(scalarmap, orientation="horizontal", fraction=0.06, pad=-0.1,
+                        ticks=[young_min, young_average, young_max])
     cbar.ax.tick_params(labelsize='large')
     cbar.set_label(r'directional stiffness $E$ (MPa)', size=15, labelpad=20)
 
@@ -92,13 +99,15 @@ def plot_linear_compressibility_3d(stiffness_matrix: StiffnessTensor) -> None:
     data_y_neg = np.zeros((len(theta_array), len(phi_array)))
     data_z_neg = np.zeros((len(theta_array), len(phi_array)))
 
-    data_linear_compressibility_pos = np.zeros((n_points, 2*n_points))
+    data_linear_compressibility_pos = np.zeros((n_points, 2 * n_points))
     data_linear_compressibility_neg = np.zeros((n_points, 2 * n_points))
 
     for index_theta in range(len(theta_array)):
         for index_phi in range(len(phi_array)):
-            linear_compressibility_pos = max(0.0, stiffness_matrix.linear_compressibility((theta_array[index_theta], phi_array[index_phi])))
-            linear_compressibility_neg = max(0.0, -stiffness_matrix.linear_compressibility((theta_array[index_theta], phi_array[index_phi])))
+            linear_compressibility_pos = max(0.0, stiffness_matrix.linear_compressibility(
+                (theta_array[index_theta], phi_array[index_phi])))
+            linear_compressibility_neg = max(0.0, -stiffness_matrix.linear_compressibility(
+                (theta_array[index_theta], phi_array[index_phi])))
 
             data_linear_compressibility_pos[index_theta, index_phi] = linear_compressibility_pos
             data_linear_compressibility_neg[index_theta, index_phi] = linear_compressibility_neg
@@ -132,12 +141,13 @@ def plot_linear_compressibility_3d(stiffness_matrix: StiffnessTensor) -> None:
     axes.plot_surface(data_x_pos, data_y_pos, data_z_pos, norm=norm_pos, cmap='viridis')
     axes.plot_surface(data_x_neg, data_y_neg, data_z_neg, norm=norm_neg, cmap='viridis')
 
-    scalarmap = cm.ScalarMappable(cmap='viridis', norm=norm)
+    scalarmap = cm.ScalarMappable(cmap=_symmetrical_viridis, norm=norm)
     scalarmap.set_clim(linear_compressibility_min, linear_compressibility_max)
 
-    cbar = plt.colorbar(scalarmap, orientation="horizontal", fraction=0.06, pad=-0.1, ticks=[linear_compressibility_min, 0.0, linear_compressibility_max])
+    cbar = plt.colorbar(scalarmap, orientation="horizontal", fraction=0.06, pad=-0.1,
+                        ticks=[linear_compressibility_min, 0.0, linear_compressibility_max])
     cbar.ax.tick_params(labelsize='large')
-    cbar.set_label(r'directional stiffness $E$ (MPa)', size=15, labelpad=20)
+    cbar.set_label(r'directional linear compressibility $LC$ (MPa $^{-1}$)', size=15, labelpad=20)
 
     axes.figure.axes[1].tick_params(axis="x", labelsize=20)
     axes.azim = 30
@@ -145,3 +155,92 @@ def plot_linear_compressibility_3d(stiffness_matrix: StiffnessTensor) -> None:
 
     plt.savefig("directional_linear_compressibility.png", transparent=True)
     plt.show()
+
+
+def plot_shear_modulus_3d(stiffness_matrix: StiffnessTensor) -> None:
+    """3D plotter for shear modulus"""
+
+    n_points = 200
+
+    theta_array = np.linspace(0, np.pi, n_points)
+    phi_array = np.linspace(0, np.pi, n_points)
+    phi_plus_pi_array = [phi_array[i] + np.pi for i in range(1, len(phi_array))]
+    phi_array = np.append(phi_array, phi_plus_pi_array)
+
+    data_x_shear_min = np.zeros((len(theta_array), len(phi_array)))
+    data_y_shear_min = np.zeros((len(theta_array), len(phi_array)))
+    data_z_shear_min = np.zeros((len(theta_array), len(phi_array)))
+    data_x_shear_max = np.zeros((len(theta_array), len(phi_array)))
+    data_y_shear_max = np.zeros((len(theta_array), len(phi_array)))
+    data_z_shear_max = np.zeros((len(theta_array), len(phi_array)))
+
+    data_shear_max = np.zeros((n_points, 2 * n_points))
+    data_shear_min = np.zeros((n_points, 2 * n_points))
+
+    for index_theta in range(len(theta_array)):
+        for index_phi in range(len(phi_array)):
+            shear = stiffness_matrix.shear_3d((theta_array[index_theta], phi_array[index_phi]))
+            data_shear_min[index_theta, index_phi] = shear[0]
+            data_shear_max[index_theta, index_phi] = shear[1]
+            z = np.cos(theta_array[index_theta])
+            x = np.sin(theta_array[index_theta]) * np.cos(phi_array[index_phi])
+            y = np.sin(theta_array[index_theta]) * np.sin(phi_array[index_phi])
+
+            shear_min = shear[0]
+            z_min = shear_min * z
+            x_min = shear_min * x
+            y_min = shear_min * y
+            data_x_shear_min[index_theta, index_phi] = x_min
+            data_y_shear_min[index_theta, index_phi] = y_min
+            data_z_shear_min[index_theta, index_phi] = z_min
+
+            shear_max = shear[1]
+            z_max = shear_max * z
+            x_max = shear_max * x
+            y_max = shear_max * y
+            data_x_shear_max[index_theta, index_phi] = x_max
+            data_y_shear_max[index_theta, index_phi] = y_max
+            data_z_shear_max[index_theta, index_phi] = z_max
+
+    shear_min_average = np.average(data_shear_min)
+    shear_min_min = np.min(data_shear_min)
+    shear_min_max = np.max(data_shear_min)
+
+    shear_max_average = np.average(data_shear_max)
+    shear_max_min = np.min(data_shear_max)
+    shear_max_max = np.max(data_shear_max)
+
+    plt.figure()
+    axes = plt.axes(projection='3d')
+
+    norm_min = colors.Normalize(vmin=shear_min_min, vmax=shear_min_max, clip=False)
+    norm_max = colors.Normalize(vmin=shear_max_min, vmax=shear_max_max, clip=False)
+
+    axes.plot_surface(data_x_shear_min, data_y_shear_min, data_z_shear_min, norm=norm_min, cmap=_symmetrical_greens)
+    axes.plot_surface(data_x_shear_max, data_y_shear_max, data_z_shear_max, norm=norm_max, cmap=_symmetrical_blues)
+
+    scalarmap_shear_min = cm.ScalarMappable(cmap=_symmetrical_greens, norm=norm_min)
+    scalarmap_shear_min.set_clim(shear_min_min, shear_min_max)
+
+    scalarmap_shear_max = cm.ScalarMappable(cmap=_symmetrical_blues, norm=norm_max)
+    scalarmap_shear_max.set_clim(shear_max_min, shear_max_max)
+
+    cbar_min = plt.colorbar(scalarmap_shear_min, location= "bottom", orientation="horizontal", fraction=0.06, pad=-0.1,
+                        ticks=[shear_min_min, shear_min_average, shear_min_max])
+    cbar_min.ax.tick_params(labelsize='large')
+    cbar_min.set_label(r'directional shear modulus $G_{min}$ (MPa)', size=15, labelpad=20)
+
+    cbar_max = plt.colorbar(scalarmap_shear_max, location= "top", orientation="horizontal", fraction=0.06, pad=-0.1,
+                        ticks=[shear_max_min, shear_max_average, shear_max_max])
+    cbar_max.ax.tick_params(labelsize='large')
+    cbar_max.set_label(r'directional shear modulus $G_{max}$ (MPa)', size=15, labelpad=20)
+
+    axes.figure.axes[1].tick_params(axis="x", labelsize=20)
+    axes.azim = 30
+    axes.elev = 30
+
+    plt.savefig("directional_shear_modulus.png", transparent=True)
+    plt.show()
+
+
+
