@@ -30,6 +30,7 @@ def _symmetrical_colormap(cmap_settings, new_name=None):
 _symmetrical_viridis = _symmetrical_colormap(('viridis', None))
 _symmetrical_blues = _symmetrical_colormap(('Blues', None))
 _symmetrical_greens = _symmetrical_colormap(('Greens', None))
+_symmetrical_reds = _symmetrical_colormap(('Reds', None))
 
 
 def plot_young_3d(stiffness_matrix: StiffnessTensor) -> None:
@@ -217,7 +218,8 @@ def plot_shear_modulus_3d(stiffness_matrix: StiffnessTensor) -> None:
     norm_max = colors.Normalize(vmin=shear_max_min, vmax=shear_max_max, clip=False)
 
     axes.plot_surface(data_x_shear_min, data_y_shear_min, data_z_shear_min, norm=norm_min, cmap=_symmetrical_greens)
-    axes.plot_surface(data_x_shear_max, data_y_shear_max, data_z_shear_max, norm=norm_max, cmap=_symmetrical_blues)
+    axes.plot_surface(data_x_shear_max, data_y_shear_max, data_z_shear_max, norm=norm_max, cmap=_symmetrical_blues,
+                      alpha=0.5)
 
     scalarmap_shear_min = cm.ScalarMappable(cmap=_symmetrical_greens, norm=norm_min)
     scalarmap_shear_min.set_clim(shear_min_min, shear_min_max)
@@ -225,13 +227,13 @@ def plot_shear_modulus_3d(stiffness_matrix: StiffnessTensor) -> None:
     scalarmap_shear_max = cm.ScalarMappable(cmap=_symmetrical_blues, norm=norm_max)
     scalarmap_shear_max.set_clim(shear_max_min, shear_max_max)
 
-    cbar_min = plt.colorbar(scalarmap_shear_min, location= "bottom", orientation="horizontal", fraction=0.06, pad=-0.1,
-                        ticks=[shear_min_min, shear_min_average, shear_min_max])
+    cbar_min = plt.colorbar(scalarmap_shear_min, location="bottom", orientation="horizontal", fraction=0.06, pad=-0.1,
+                            ticks=[shear_min_min, shear_min_average, shear_min_max])
     cbar_min.ax.tick_params(labelsize='large')
     cbar_min.set_label(r'directional shear modulus $G_{min}$ (MPa)', size=15, labelpad=20)
 
-    cbar_max = plt.colorbar(scalarmap_shear_max, location= "top", orientation="horizontal", fraction=0.06, pad=-0.1,
-                        ticks=[shear_max_min, shear_max_average, shear_max_max])
+    cbar_max = plt.colorbar(scalarmap_shear_max, location="top", orientation="horizontal", fraction=0.06, pad=-0.1,
+                            ticks=[shear_max_min, shear_max_average, shear_max_max])
     cbar_max.ax.tick_params(labelsize='large')
     cbar_max.set_label(r'directional shear modulus $G_{max}$ (MPa)', size=15, labelpad=20)
 
@@ -242,5 +244,110 @@ def plot_shear_modulus_3d(stiffness_matrix: StiffnessTensor) -> None:
     plt.savefig("directional_shear_modulus.png", transparent=True)
     plt.show()
 
+
+def plot_poisson_3d(stiffness_matrix: StiffnessTensor) -> None:
+    """3D plotter for Poisson coefficient"""
+
+    n_points = 200
+
+    theta_array = np.linspace(0, np.pi, n_points)
+    phi_array = np.linspace(0, np.pi, n_points)
+    phi_plus_pi_array = [phi_array[i] + np.pi for i in range(1, len(phi_array))]
+    phi_array = np.append(phi_array, phi_plus_pi_array)
+
+    data_x_poisson_1 = np.zeros((len(theta_array), len(phi_array)))
+    data_y_poisson_1 = np.zeros((len(theta_array), len(phi_array)))
+    data_z_poisson_1 = np.zeros((len(theta_array), len(phi_array)))
+    data_x_poisson_2 = np.zeros((len(theta_array), len(phi_array)))
+    data_y_poisson_2 = np.zeros((len(theta_array), len(phi_array)))
+    data_z_poisson_2 = np.zeros((len(theta_array), len(phi_array)))
+    data_x_poisson_3 = np.zeros((len(theta_array), len(phi_array)))
+    data_y_poisson_3 = np.zeros((len(theta_array), len(phi_array)))
+    data_z_poisson_3 = np.zeros((len(theta_array), len(phi_array)))
+
+    data_poisson_1 = np.zeros((n_points, 2 * n_points))
+    data_poisson_2 = np.zeros((n_points, 2 * n_points))
+    data_poisson_3 = np.zeros((n_points, 2 * n_points))
+
+    for index_theta in range(len(theta_array)):
+        for index_phi in range(len(phi_array)):
+            poisson = stiffness_matrix.poisson_3d((theta_array[index_theta], phi_array[index_phi]))
+            z = np.cos(theta_array[index_theta])
+            x = np.sin(theta_array[index_theta]) * np.cos(phi_array[index_phi])
+            y = np.sin(theta_array[index_theta]) * np.sin(phi_array[index_phi])
+
+            poisson_1 = poisson[0]
+            data_poisson_1[(theta_array[index_theta], phi_array[index_phi])] = poisson_1
+            data_x_poisson_1[(theta_array[index_theta], phi_array[index_phi])] = poisson_1 * x
+            data_y_poisson_1[(theta_array[index_theta], phi_array[index_phi])] = poisson_1 * y
+            data_z_poisson_1[(theta_array[index_theta], phi_array[index_phi])] = poisson_1 * z
+
+            poisson_2 = poisson[1]
+            data_poisson_2[(theta_array[index_theta], phi_array[index_phi])] = poisson_2
+            data_x_poisson_2[(theta_array[index_theta], phi_array[index_phi])] = poisson_2 * x
+            data_y_poisson_2[(theta_array[index_theta], phi_array[index_phi])] = poisson_2 * y
+            data_z_poisson_2[(theta_array[index_theta], phi_array[index_phi])] = poisson_2 * z
+
+            poisson_3 = poisson[2]
+            data_poisson_3[(theta_array[index_theta], phi_array[index_phi])] = poisson_3
+            data_x_poisson_3[(theta_array[index_theta], phi_array[index_phi])] = poisson_3 * x
+            data_y_poisson_3[(theta_array[index_theta], phi_array[index_phi])] = poisson_3 * y
+            data_z_poisson_3[(theta_array[index_theta], phi_array[index_phi])] = poisson_3 * z
+
+    poisson_1_average = np.average(data_poisson_1)
+    poisson_1_min = np.min(data_poisson_1)
+    poisson_1_max = np.max(data_poisson_1)
+
+    poisson_2_average = np.average(data_poisson_2)
+    poisson_2_min = np.min(data_poisson_2)
+    poisson_2_max = np.max(data_poisson_2)
+
+    poisson_3_average = np.average(data_poisson_3)
+    poisson_3_min = np.min(data_poisson_3)
+    poisson_3_max = np.max(data_poisson_3)
+
+    plt.figure()
+    axes = plt.axes(projection='3d')
+
+    norm_poisson_1 = colors.Normalize(vmin=poisson_1_min, vmax=poisson_1_max, clip=False)
+    norm_poisson_2 = colors.Normalize(vmin=poisson_2_min, vmax=poisson_2_max, clip=False)
+    norm_poisson_3 = colors.Normalize(vmin=poisson_3_min, vmax=poisson_3_max, clip=False)
+
+    axes.plot_surface(data_x_poisson_1, data_y_poisson_1, data_z_poisson_1, norm=norm_poisson_1, cmap=_symmetrical_greens)
+    axes.plot_surface(data_x_poisson_2, data_y_poisson_2, data_z_poisson_2, norm=norm_poisson_2, cmap=_symmetrical_blues,
+                      alpha=0.5)
+    axes.plot_surface(data_x_poisson_3, data_y_poisson_3, data_z_poisson_3, norm=norm_poisson_3, cmap=_symmetrical_reds,
+                      alpha=0.5)
+
+    scalarmap_poisson_1 = cm.ScalarMappable(cmap=_symmetrical_greens, norm=norm_poisson_1)
+    scalarmap_poisson_1.set_clim(poisson_1_min, poisson_1_max)
+
+    scalarmap_poisson_2 = cm.ScalarMappable(cmap=_symmetrical_blues, norm=norm_poisson_2)
+    scalarmap_poisson_2.set_clim(poisson_2_min, poisson_2_max)
+
+    scalarmap_poisson_3 = cm.ScalarMappable(cmap=_symmetrical_reds, norm=norm_poisson_3)
+    scalarmap_poisson_3.set_clim(poisson_3_min, poisson_3_max)
+
+    cbar_poisson_1 = plt.colorbar(scalarmap_poisson_1, location="bottom", orientation="horizontal", fraction=0.06, pad=-0.1,
+                            ticks=[poisson_1_min, poisson_1_average, poisson_1_max])
+    cbar_poisson_1.ax.tick_params(labelsize='large')
+    cbar_poisson_1.set_label(r'Poisson coefficient '+ "\u03BD", size=15, labelpad=20)
+
+    cbar_poisson_2 = plt.colorbar(scalarmap_poisson_2, location="bottom", orientation="horizontal", fraction=0.06, pad=-0.1,
+                            ticks=[poisson_2_min, poisson_2_average, poisson_2_max])
+    cbar_poisson_2.ax.tick_params(labelsize='large')
+    cbar_poisson_2.set_label(r'Poisson coefficient '+ "\u03BD", size=15, labelpad=20)
+
+    cbar_poisson_3 = plt.colorbar(scalarmap_poisson_3, location="bottom", orientation="horizontal", fraction=0.06, pad=-0.1,
+                            ticks=[poisson_3_min, poisson_3_average, poisson_3_max])
+    cbar_poisson_3.ax.tick_params(labelsize='large')
+    cbar_poisson_3.set_label(r'Poisson coefficient '+ "\u03BD", size=15, labelpad=20)
+
+    axes.figure.axes[1].tick_params(axis="x", labelsize=20)
+    axes.azim = 30
+    axes.elev = 30
+
+    plt.savefig("directional_poisson_coefficient.png", transparent=True)
+    plt.show()
 
 
