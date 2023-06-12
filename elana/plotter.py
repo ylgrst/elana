@@ -44,21 +44,21 @@ def plot_young_2d(stiffness_matrix: StiffnessTensor) -> None:
     young_xz = list(map(lambda x: stiffness_matrix.young((x, 0.0)), theta_array))
     young_yz = list(map(lambda x: stiffness_matrix.young((x, np.pi)), theta_array))
 
-    x_xy = young_xy * np.cos(theta_array)
-    y_xy = young_xy * np.sin(theta_array)
+    data_x_xy = young_xy * np.cos(theta_array)
+    data_y_xy = young_xy * np.sin(theta_array)
 
-    x_xz = young_xz * np.sin(theta_array)
-    y_xz = young_xz * np.cos(theta_array)
+    data_x_xz = young_xz * np.sin(theta_array)
+    data_y_xz = young_xz * np.cos(theta_array)
 
-    x_yz = young_yz * np.sin(theta_array)
-    y_yz = young_yz * np.sin(theta_array)
+    data_x_yz = young_yz * np.sin(theta_array)
+    data_y_yz = young_yz * np.sin(theta_array)
 
     fig, (ax_xy, ax_xz, ax_yz) = plt.subplots(1, 3)
-    ax_xy.plot(x_xy, y_xy, 'g-')
+    ax_xy.plot(data_x_xy, data_y_xy, 'g-')
     ax_xy.set_title("Young modulus on (xy) plane")
-    ax_xz.plot(x_xz, y_xz, 'g-')
+    ax_xz.plot(data_x_xz, data_y_xz, 'g-')
     ax_xz.set_title("Young modulus on (xz) plane")
-    ax_yz.plot(x_yz, y_yz, 'g-')
+    ax_yz.plot(data_x_yz, data_y_yz, 'g-')
     ax_yz.set_title("Young modulus on (yz) plane")
 
     plt.savefig("planar_young.png", transparent=True)
@@ -114,6 +114,56 @@ def plot_young_3d(stiffness_matrix: StiffnessTensor) -> None:
 
     plt.savefig("directional_young.png", transparent=True)
     plt.show()
+
+
+def plot_linear_compressibility_2d(stiffness_matrix: StiffnessTensor) -> None:
+    """2D plotter for linear compressibility modulus"""
+
+    n_points = 100
+
+    theta_array = np.linspace(0, np.pi, n_points)
+
+    linear_compressibility_pos_xy = list(map(lambda x: max(0.0, stiffness_matrix.linear_compressibility((np.pi/2.0, x)), theta_array)))
+    linear_compressibility_pos_xz = list(
+        map(lambda x: max(0.0, stiffness_matrix.linear_compressibility((x, 0.0)), theta_array)))
+    linear_compressibility_pos_yz = list(
+        map(lambda x: max(0.0, stiffness_matrix.linear_compressibility((x, np.pi/2.0)), theta_array)))
+
+    data_x_xy_pos = linear_compressibility_pos_xy*np.cos(theta_array)
+    data_y_xy_pos = linear_compressibility_pos_xy*np.sin(theta_array)
+    data_x_xz_pos = linear_compressibility_pos_xz*np.sin(theta_array)
+    data_y_xz_pos = linear_compressibility_pos_xz*np.cos(theta_array)
+    data_x_yz_pos = linear_compressibility_pos_yz*np.sin(theta_array)
+    data_y_yz_pos = linear_compressibility_pos_yz*np.cos(theta_array)
+
+    linear_compressibility_neg_xy = list(map(lambda x: max(0.0, -stiffness_matrix.linear_compressibility((np.pi/2.0, x)), theta_array)))
+    linear_compressibility_neg_xz = list(
+        map(lambda x: max(0.0, -stiffness_matrix.linear_compressibility((x, 0.0)), theta_array)))
+    linear_compressibility_neg_yz = list(
+        map(lambda x: max(0.0, -stiffness_matrix.linear_compressibility((x, np.pi/2.0)), theta_array)))
+
+    data_x_xy_neg = linear_compressibility_neg_xy*np.cos(theta_array)
+    data_y_xy_neg = linear_compressibility_neg_xy*np.sin(theta_array)
+    data_x_xz_neg = linear_compressibility_neg_xz*np.sin(theta_array)
+    data_y_xz_neg = linear_compressibility_neg_xz*np.cos(theta_array)
+    data_x_yz_neg = linear_compressibility_neg_yz*np.sin(theta_array)
+    data_y_yz_neg = linear_compressibility_neg_yz*np.cos(theta_array)
+
+    fig, (ax_xy, ax_xz, ax_yz) = plt.subplots(1, 3)
+    ax_xy.plot(data_x_xy_pos, data_y_xy_pos, 'g-')
+    ax_xy.plot(data_x_xy_neg, data_y_xy_neg, 'r-')
+    ax_xy.set_title("Linear compressibility on (xy) plane")
+    ax_xz.plot(data_x_xz_pos, data_y_xz_pos, 'g-')
+    ax_xz.plot(data_x_xz_neg, data_y_xz_neg, 'r-')
+    ax_xz.set_title("Linear compressibility on (xz) plane")
+    ax_yz.plot(data_x_yz_pos, data_y_yz_pos, 'g-')
+    ax_yz.plot(data_x_yz_neg, data_y_yz_neg, 'r-')
+    ax_yz.set_title("Linear compressibility on (yz) plane")
+
+    plt.savefig("planar_linear_compressibility.png", transparent=True)
+    plt.show()
+
+
 
 
 def plot_linear_compressibility_3d(stiffness_matrix: StiffnessTensor) -> None:
