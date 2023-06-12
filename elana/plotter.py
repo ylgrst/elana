@@ -33,6 +33,38 @@ _symmetrical_greens = _symmetrical_colormap(('Greens', None))
 _symmetrical_reds = _symmetrical_colormap(('Reds', None))
 
 
+def plot_young_2d(stiffness_matrix: StiffnessTensor) -> None:
+    """2D plotter for Young modulus"""
+
+    n_points = 100
+
+    theta_array = np.linspace(0, np.pi, n_points)
+
+    young_xy = list(map(lambda x: stiffness_matrix.young((np.pi / 2, x)), theta_array))
+    young_xz = list(map(lambda x: stiffness_matrix.young((x, 0.0)), theta_array))
+    young_yz = list(map(lambda x: stiffness_matrix.young((x, np.pi)), theta_array))
+
+    x_xy = young_xy * np.cos(theta_array)
+    y_xy = young_xy * np.sin(theta_array)
+
+    x_xz = young_xz * np.sin(theta_array)
+    y_xz = young_xz * np.cos(theta_array)
+
+    x_yz = young_yz * np.sin(theta_array)
+    y_yz = young_yz * np.sin(theta_array)
+
+    fig, (ax_xy, ax_xz, ax_yz) = plt.subplots(1, 3)
+    ax_xy.plot(x_xy, y_xy, 'g-')
+    ax_xy.set_title("Young modulus on (xy) plane")
+    ax_xz.plot(x_xz, y_xz, 'g-')
+    ax_xz.set_title("Young modulus on (xz) plane")
+    ax_yz.plot(x_yz, y_yz, 'g-')
+    ax_yz.set_title("Young modulus on (yz) plane")
+
+    plt.savefig("planar_young.png", transparent=True)
+    plt.show()
+
+
 def plot_young_3d(stiffness_matrix: StiffnessTensor) -> None:
     """3D plotter for Young modulus"""
 
@@ -313,8 +345,10 @@ def plot_poisson_3d(stiffness_matrix: StiffnessTensor) -> None:
     norm_poisson_2 = colors.Normalize(vmin=poisson_2_min, vmax=poisson_2_max, clip=False)
     norm_poisson_3 = colors.Normalize(vmin=poisson_3_min, vmax=poisson_3_max, clip=False)
 
-    axes.plot_surface(data_x_poisson_1, data_y_poisson_1, data_z_poisson_1, norm=norm_poisson_1, cmap=_symmetrical_greens)
-    axes.plot_surface(data_x_poisson_2, data_y_poisson_2, data_z_poisson_2, norm=norm_poisson_2, cmap=_symmetrical_blues,
+    axes.plot_surface(data_x_poisson_1, data_y_poisson_1, data_z_poisson_1, norm=norm_poisson_1,
+                      cmap=_symmetrical_greens)
+    axes.plot_surface(data_x_poisson_2, data_y_poisson_2, data_z_poisson_2, norm=norm_poisson_2,
+                      cmap=_symmetrical_blues,
                       alpha=0.5)
     axes.plot_surface(data_x_poisson_3, data_y_poisson_3, data_z_poisson_3, norm=norm_poisson_3, cmap=_symmetrical_reds,
                       alpha=0.5)
@@ -328,20 +362,23 @@ def plot_poisson_3d(stiffness_matrix: StiffnessTensor) -> None:
     scalarmap_poisson_3 = cm.ScalarMappable(cmap=_symmetrical_reds, norm=norm_poisson_3)
     scalarmap_poisson_3.set_clim(poisson_3_min, poisson_3_max)
 
-    cbar_poisson_1 = plt.colorbar(scalarmap_poisson_1, location="bottom", orientation="horizontal", fraction=0.06, pad=-0.1,
-                            ticks=[poisson_1_min, poisson_1_average, poisson_1_max])
+    cbar_poisson_1 = plt.colorbar(scalarmap_poisson_1, location="bottom", orientation="horizontal", fraction=0.06,
+                                  pad=-0.1,
+                                  ticks=[poisson_1_min, poisson_1_average, poisson_1_max])
     cbar_poisson_1.ax.tick_params(labelsize='large')
-    cbar_poisson_1.set_label(r'Poisson coefficient '+ "\u03BD", size=15, labelpad=20)
+    cbar_poisson_1.set_label(r'Poisson coefficient ' + "\u03BD", size=15, labelpad=20)
 
-    cbar_poisson_2 = plt.colorbar(scalarmap_poisson_2, location="bottom", orientation="horizontal", fraction=0.06, pad=-0.1,
-                            ticks=[poisson_2_min, poisson_2_average, poisson_2_max])
+    cbar_poisson_2 = plt.colorbar(scalarmap_poisson_2, location="bottom", orientation="horizontal", fraction=0.06,
+                                  pad=-0.1,
+                                  ticks=[poisson_2_min, poisson_2_average, poisson_2_max])
     cbar_poisson_2.ax.tick_params(labelsize='large')
-    cbar_poisson_2.set_label(r'Poisson coefficient '+ "\u03BD", size=15, labelpad=20)
+    cbar_poisson_2.set_label(r'Poisson coefficient ' + "\u03BD", size=15, labelpad=20)
 
-    cbar_poisson_3 = plt.colorbar(scalarmap_poisson_3, location="bottom", orientation="horizontal", fraction=0.06, pad=-0.1,
-                            ticks=[poisson_3_min, poisson_3_average, poisson_3_max])
+    cbar_poisson_3 = plt.colorbar(scalarmap_poisson_3, location="bottom", orientation="horizontal", fraction=0.06,
+                                  pad=-0.1,
+                                  ticks=[poisson_3_min, poisson_3_average, poisson_3_max])
     cbar_poisson_3.ax.tick_params(labelsize='large')
-    cbar_poisson_3.set_label(r'Poisson coefficient '+ "\u03BD", size=15, labelpad=20)
+    cbar_poisson_3.set_label(r'Poisson coefficient ' + "\u03BD", size=15, labelpad=20)
 
     axes.figure.axes[1].tick_params(axis="x", labelsize=20)
     axes.azim = 30
@@ -349,5 +386,3 @@ def plot_poisson_3d(stiffness_matrix: StiffnessTensor) -> None:
 
     plt.savefig("directional_poisson_coefficient.png", transparent=True)
     plt.show()
-
-
