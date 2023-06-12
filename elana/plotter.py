@@ -38,7 +38,7 @@ def plot_young_2d(stiffness_matrix: StiffnessTensor) -> None:
 
     n_points = 100
 
-    theta_array = np.linspace(0, np.pi, n_points)
+    theta_array = np.linspace(0.0, np.pi, n_points)
 
     young_xy = list(map(lambda x: stiffness_matrix.young((np.pi / 2, x)), theta_array))
     young_xz = list(map(lambda x: stiffness_matrix.young((x, 0.0)), theta_array))
@@ -70,8 +70,8 @@ def plot_young_3d(stiffness_matrix: StiffnessTensor) -> None:
 
     n_points = 200
 
-    theta_array = np.linspace(0, np.pi, n_points)
-    phi_array = np.linspace(0, 2 * np.pi, 2 * n_points)
+    theta_array = np.linspace(0.0, np.pi, n_points)
+    phi_array = np.linspace(0.0, 2 * np.pi, 2 * n_points)
 
     data_x = np.zeros((n_points, 2 * n_points))
     data_y = np.zeros((n_points, 2 * n_points))
@@ -121,7 +121,7 @@ def plot_linear_compressibility_2d(stiffness_matrix: StiffnessTensor) -> None:
 
     n_points = 100
 
-    theta_array = np.linspace(0, np.pi, n_points)
+    theta_array = np.linspace(0.0, np.pi, n_points)
 
     linear_compressibility_pos_xy = list(map(lambda x: max(0.0, stiffness_matrix.linear_compressibility((np.pi/2.0, x)), theta_array)))
     linear_compressibility_pos_xz = list(
@@ -171,8 +171,8 @@ def plot_linear_compressibility_3d(stiffness_matrix: StiffnessTensor) -> None:
 
     n_points = 200
 
-    theta_array = np.linspace(0, np.pi, n_points)
-    phi_array = np.linspace(0, 2 * np.pi, 2 * n_points)
+    theta_array = np.linspace(0.0, np.pi, n_points)
+    phi_array = np.linspace(0.0, 2 * np.pi, 2 * n_points)
 
     data_x_pos = np.zeros((len(theta_array), len(phi_array)))
     data_y_pos = np.zeros((len(theta_array), len(phi_array)))
@@ -240,13 +240,54 @@ def plot_linear_compressibility_3d(stiffness_matrix: StiffnessTensor) -> None:
     plt.show()
 
 
+def plot_shear_modulus_2d(stiffness_matrix: StiffnessTensor) -> None:
+    """2D plotter for shear modulus"""
+
+    n_points = 100
+
+    theta_array = np.linspace(0.0, np.pi, n_points)
+
+    shear_xy = list(map(lambda x: stiffness_matrix.shear_2d((np.pi/2.0, x)), theta_array))
+    shear_xz = list(map(lambda x: stiffness_matrix.shear_2d((x, 0.0)), theta_array))
+    shear_yz = list(map(lambda x: stiffness_matrix.shear_2d((x, np.pi/2.0)), theta_array))
+
+    data_x_xy_min = np.array([shear[0] * np.cos(theta) for shear, theta in zip(shear_xy, theta_array)])
+    data_y_xy_min = np.array([shear[0] * np.sin(theta) for shear, theta in zip(shear_xy, theta_array)])
+    data_x_xy_max = np.array([shear[1] * np.cos(theta) for shear, theta in zip(shear_xy, theta_array)])
+    data_y_xy_max = np.array([shear[1] * np.sin(theta) for shear, theta in zip(shear_xy, theta_array)])
+
+    data_x_xz_min = np.array([shear[0] * np.sin(theta) for shear, theta in zip(shear_xz, theta_array)])
+    data_y_xz_min = np.array([shear[0] * np.cos(theta) for shear, theta in zip(shear_xz, theta_array)])
+    data_x_xz_max = np.array([shear[1] * np.sin(theta) for shear, theta in zip(shear_xz, theta_array)])
+    data_y_xz_max = np.array([shear[1] * np.cos(theta) for shear, theta in zip(shear_xz, theta_array)])
+
+    data_x_yz_min = np.array([shear[0] * np.sin(theta) for shear, theta in zip(shear_yz, theta_array)])
+    data_y_yz_min = np.array([shear[0] * np.cos(theta) for shear, theta in zip(shear_yz, theta_array)])
+    data_x_yz_max = np.array([shear[1] * np.sin(theta) for shear, theta in zip(shear_yz, theta_array)])
+    data_y_yz_max = np.array([shear[1] * np.cos(theta) for shear, theta in zip(shear_yz, theta_array)])
+
+    fig, (ax_xy, ax_xz, ax_yz) = plt.subplots(1, 3)
+    ax_xy.plot(data_x_xy_max, data_y_xy_max, 'b-')
+    ax_xy.plot(data_x_xy_min, data_y_xy_min, 'g-')
+    ax_xy.set_title("Shear modulus on (xy) plane")
+    ax_xz.plot(data_x_xz_max, data_y_xz_max, 'b-')
+    ax_xz.plot(data_x_xz_min, data_y_xz_min, 'g-')
+    ax_xz.set_title("Shear modulus on (xz) plane")
+    ax_yz.plot(data_x_yz_max, data_y_yz_max, 'b-')
+    ax_yz.plot(data_x_yz_min, data_y_yz_min, 'g-')
+    ax_yz.set_title("Shear modulus on (yz) plane")
+
+    plt.savefig("planar_shear_modulus.png", transparent=True)
+    plt.show()
+
+
 def plot_shear_modulus_3d(stiffness_matrix: StiffnessTensor) -> None:
     """3D plotter for shear modulus"""
 
     n_points = 200
 
-    theta_array = np.linspace(0, np.pi, n_points)
-    phi_array = np.linspace(0, np.pi, n_points)
+    theta_array = np.linspace(0.0, np.pi, n_points)
+    phi_array = np.linspace(0.0, np.pi, n_points)
     phi_plus_pi_array = [phi_array[i] + np.pi for i in range(1, len(phi_array))]
     phi_array = np.append(phi_array, phi_plus_pi_array)
 
@@ -332,8 +373,8 @@ def plot_poisson_3d(stiffness_matrix: StiffnessTensor) -> None:
 
     n_points = 200
 
-    theta_array = np.linspace(0, np.pi, n_points)
-    phi_array = np.linspace(0, np.pi, n_points)
+    theta_array = np.linspace(0.0, np.pi, n_points)
+    phi_array = np.linspace(0.0, np.pi, n_points)
     phi_plus_pi_array = [phi_array[i] + np.pi for i in range(1, len(phi_array))]
     phi_array = np.append(phi_array, phi_plus_pi_array)
 
