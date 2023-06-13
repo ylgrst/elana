@@ -368,6 +368,57 @@ def plot_shear_modulus_3d(stiffness_matrix: StiffnessTensor) -> None:
     plt.show()
 
 
+def plot_poisson_2d(stiffness_matrix: StiffnessTensor) -> None:
+    """2D plotter for Poisson coefficient"""
+
+    n_points = 100
+
+    theta_array = np.linspace(0.0, np.pi, n_points)
+
+    poisson_xy = list(map(lambda x: stiffness_matrix.poisson_2d((np.pi/2.0, x)), theta_array))
+    poisson_xz = list(map(lambda x: stiffness_matrix.poisson_2d((x, 0.0)), theta_array))
+    poisson_yz = list(map(lambda x: stiffness_matrix.poisson_2d((x, np.pi/2.0)), theta_array))
+
+    data_x_xy_1 = np.array([poisson[0] * np.cos(theta) for poisson, theta in zip(poisson_xy, theta_array)])
+    data_y_xy_1 = np.array([poisson[0] * np.sin(theta) for poisson, theta in zip(poisson_xy, theta_array)])
+    data_x_xy_2 = np.array([poisson[1] * np.cos(theta) for poisson, theta in zip(poisson_xy, theta_array)])
+    data_y_xy_2 = np.array([poisson[1] * np.sin(theta) for poisson, theta in zip(poisson_xy, theta_array)])
+    data_x_xy_3 = np.array([poisson[2] * np.cos(theta) for poisson, theta in zip(poisson_xy, theta_array)])
+    data_y_xy_3 = np.array([poisson[2] * np.sin(theta) for poisson, theta in zip(poisson_xy, theta_array)])
+
+    data_x_xz_1 = np.array([poisson[0] * np.sin(theta) for poisson, theta in zip(poisson_xz, theta_array)])
+    data_y_xz_1 = np.array([poisson[0] * np.cos(theta) for poisson, theta in zip(poisson_xz, theta_array)])
+    data_x_xz_2 = np.array([poisson[1] * np.sin(theta) for poisson, theta in zip(poisson_xz, theta_array)])
+    data_y_xz_2 = np.array([poisson[1] * np.cos(theta) for poisson, theta in zip(poisson_xz, theta_array)])
+    data_x_xz_3 = np.array([poisson[2] * np.sin(theta) for poisson, theta in zip(poisson_xz, theta_array)])
+    data_y_xz_3 = np.array([poisson[2] * np.cos(theta) for poisson, theta in zip(poisson_xz, theta_array)])
+
+    data_x_yz_1 = np.array([poisson[0] * np.sin(theta) for poisson, theta in zip(poisson_xy, theta_array)])
+    data_y_yz_1 = np.array([poisson[0] * np.cos(theta) for poisson, theta in zip(poisson_xy, theta_array)])
+    data_x_yz_2 = np.array([poisson[1] * np.sin(theta) for poisson, theta in zip(poisson_xy, theta_array)])
+    data_y_yz_2 = np.array([poisson[1] * np.cos(theta) for poisson, theta in zip(poisson_xy, theta_array)])
+    data_x_yz_3 = np.array([poisson[2] * np.sin(theta) for poisson, theta in zip(poisson_xy, theta_array)])
+    data_y_yz_3 = np.array([poisson[2] * np.cos(theta) for poisson, theta in zip(poisson_xy, theta_array)])
+
+    fig, (ax_xy, ax_xz, ax_yz) = plt.subplots(1, 3)
+    ax_xy.plot(data_x_xy_1, data_y_xy_1, 'b-')
+    ax_xy.plot(data_x_xy_2, data_y_xy_2, 'g-')
+    ax_xy.plot(data_x_xy_3, data_y_xy_3, 'r-')
+    ax_xy.set_title("Poisson coefficient on (xy) plane")
+    ax_xz.plot(data_x_xz_1, data_y_xz_1, 'b-')
+    ax_xz.plot(data_x_xz_2, data_y_xz_2, 'g-')
+    ax_xz.plot(data_x_xz_3, data_y_xz_3, 'r-')
+    ax_xz.set_title("Poisson coefficient on (xz) plane")
+    ax_yz.plot(data_x_yz_1, data_y_yz_1, 'b-')
+    ax_yz.plot(data_x_yz_2, data_y_yz_2, 'g-')
+    ax_yz.plot(data_x_yz_3, data_y_yz_3, 'g-')
+    ax_yz.set_title("Poisson coefficient on (yz) plane")
+
+    plt.savefig("planar_poisson_coefficient.png", transparent=True)
+    plt.show()
+
+
+
 def plot_poisson_3d(stiffness_matrix: StiffnessTensor) -> None:
     """3D plotter for Poisson coefficient"""
 
