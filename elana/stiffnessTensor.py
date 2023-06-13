@@ -1,9 +1,9 @@
 import numpy as np
 import numpy.typing as npt
-from operations import compute_direction_vector_spherical_to_cartesian
+from .operations import compute_direction_vector_spherical_to_cartesian
 from scipy import optimize
 
-_VOIGT_MATRIX: npt.NDArray[int] = np.array([0, 5, 4], [5, 1, 3], [4, 3, 2])
+_VOIGT_MATRIX: npt.NDArray[int] = np.array([[0, 5, 4], [5, 1, 3], [4, 3, 2]])
 
 
 def _compute_voigt_coefficient(p: int, q: int) -> float:
