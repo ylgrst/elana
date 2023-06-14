@@ -1,5 +1,5 @@
 import math as m
-from .stiffnessTensor import StiffnessTensor
+from .stiffness_tensor import StiffnessTensor
 
 
 class Orthorhombic(StiffnessTensor):

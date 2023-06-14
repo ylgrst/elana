@@ -1,5 +1,5 @@
 import numpy as np
-from stiffnessTensor import StiffnessTensor
+from elana.stiffness_tensor import StiffnessTensor
 import numpy.typing as npt
 import matplotlib.pyplot as plt
 from matplotlib import cm, colors
