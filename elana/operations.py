@@ -6,7 +6,7 @@ import numpy.typing as npt
 
 def compute_direction_vector_spherical_to_cartesian(theta : float, phi : float, chi : float = None) -> list[float]:
     if chi is None:
-        return [m.sin(theta)*m.cos(phi), m.sin(theta)]
+        return [m.sin(theta)*m.cos(phi), m.sin(theta)*m.sin(phi), m.cos(theta)]
     else:
         return [m.cos(theta)*m.cos(phi)*m.cos(chi) - m.sin(phi)*m.sin(chi),
              m.cos(theta)*m.sin(phi)*m.cos(chi) + m.cos(phi)*m.sin(chi),
