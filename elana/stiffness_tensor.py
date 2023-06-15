@@ -1,13 +1,28 @@
 import numpy as np
 import numpy.typing as npt
+import itertools
 from .operations import compute_direction_vector_spherical_to_cartesian
 from scipy import optimize
 
-_VOIGT_MATRIX: npt.NDArray[int] = np.array([[0, 5, 4], [5, 1, 3], [4, 3, 2]])
+#_VOIGT_MATRIX: npt.NDArray[int] = np.array([[0, 5, 4], [5, 1, 3], [4, 3, 2]])
+#_VOIGT_NOTATION = [(0, 0), (1, 1), (2, 2), (0, 1), (0, 2), (1, 2)] #abaqus
+_VOIGT_NOTATION = [(0, 0), (1, 1), (2, 2), (1, 2), (0, 2), (0, 1)] #elate
 
+#def _compute_voigt_coefficient(p: int, q: int) -> float:
+#    return 1. / ((1 + p // 3) * (1 + q // 3))
 
-def _compute_voigt_coefficient(p: int, q: int) -> float:
-    return 1. / ((1 + p // 3) * (1 + q // 3))
+def _compute_voigt_6_index_from_3x3(i, j):
+    if i == j:
+        return i
+    return 6-i-j
+
+def _compute_4th_order_tensor_from_6x6_matrix(matrix : npt.NDArray[np.float_]) -> npt.NDArray[np.float_]:
+    output_tensor = np.zeros((3,3,3,3))
+    for i, j, k, l in itertools.product(range(3), range(3), range(3), range(3)):
+        voigt_i = _compute_voigt_6_index_from_3x3(i, j)
+        voigt_j = _compute_voigt_6_index_from_3x3(k, l)
+        output_tensor[i, j, k, l] = matrix[voigt_i, voigt_j]
+    return output_tensor
 
 
 class StiffnessTensor:
@@ -38,10 +53,12 @@ class StiffnessTensor:
         except:
             raise ValueError("Matrix is singular")
 
-    def _convert_to_tensor(self) -> npt.NDArray[np.float_]:
-        self.flexibility_tensor = [[[[_compute_voigt_coefficient(_VOIGT_MATRIX[i][j], _VOIGT_MATRIX[k][l]) *
-                                      self.flexibility_matrix[_VOIGT_MATRIX[i][j]][_VOIGT_MATRIX[k][l]]
-                                      for i in range(3)] for j in range(3)] for k in range(3)] for l in range(3)]
+    # def _convert_to_tensor(self) -> npt.NDArray[np.float_]:
+    #     self.flexibility_tensor = [[[[_compute_voigt_coefficient(_VOIGT_MATRIX[i][j], _VOIGT_MATRIX[k][l]) *
+    #                                   self.flexibility_matrix[_VOIGT_MATRIX[i][j]][_VOIGT_MATRIX[k][l]]
+    #                                   for i in range(3)] for j in range(3)] for k in range(3)] for l in range(3)]
+    def _convert_flexibility_matrix_to_tensor(self) -> None:
+        self.flexibility_tensor = _compute_4th_order_tensor_from_6x6_matrix(self.flexibility_matrix)
 
     def is_orthorhombic(self) -> bool:
         stiffness_matrix_orthorhombic_coefficient_list: list[float] = [self.matrix[0][3], self.matrix[0][4],
