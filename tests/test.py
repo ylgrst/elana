@@ -13,19 +13,8 @@ def tmp_dir(tmp_path_factory: pytest.TempPathFactory) -> Path:
 
 
 @pytest.fixture(scope="function")
-def tmp_matrix_txt_filename(tmp_dir: Path) -> str:
-    return (tmp_dir / "tensor_ones.txt").as_posix()
-
-
-@pytest.fixture(scope="function")
 def trigonal_matrix_filename() -> str:
     return 'trigonal_stiffness_matrix.txt'
-
-
-def tensor_ones(tmp_matrix_txt_filename) -> str:
-    ones = np.ones((6, 6))
-    np.savetxt(tmp_matrix_txt_filename, ones)
-    return tmp_matrix_txt_filename
 
 
 def test_trigonal_matrix_read_matrix_from_txt_compare_with_reference_must_return_true(

@@ -123,11 +123,11 @@ def plot_linear_compressibility_2d(stiffness_matrix: StiffnessTensor) -> None:
 
     theta_array = np.linspace(0.0, np.pi, n_points)
 
-    linear_compressibility_pos_xy = list(map(lambda x: max(0.0, stiffness_matrix.linear_compressibility((np.pi/2.0, x)), theta_array)))
+    linear_compressibility_pos_xy = list(map(lambda x: max(0.0, stiffness_matrix.linear_compressibility((np.pi/2.0, x))), theta_array))
     linear_compressibility_pos_xz = list(
-        map(lambda x: max(0.0, stiffness_matrix.linear_compressibility((x, 0.0)), theta_array)))
+        map(lambda x: max(0.0, stiffness_matrix.linear_compressibility((x, 0.0))), theta_array))
     linear_compressibility_pos_yz = list(
-        map(lambda x: max(0.0, stiffness_matrix.linear_compressibility((x, np.pi/2.0)), theta_array)))
+        map(lambda x: max(0.0, stiffness_matrix.linear_compressibility((x, np.pi/2.0))), theta_array))
 
     data_x_xy_pos = linear_compressibility_pos_xy*np.cos(theta_array)
     data_y_xy_pos = linear_compressibility_pos_xy*np.sin(theta_array)
@@ -136,11 +136,11 @@ def plot_linear_compressibility_2d(stiffness_matrix: StiffnessTensor) -> None:
     data_x_yz_pos = linear_compressibility_pos_yz*np.sin(theta_array)
     data_y_yz_pos = linear_compressibility_pos_yz*np.cos(theta_array)
 
-    linear_compressibility_neg_xy = list(map(lambda x: max(0.0, -stiffness_matrix.linear_compressibility((np.pi/2.0, x)), theta_array)))
+    linear_compressibility_neg_xy = list(map(lambda x: max(0.0, -stiffness_matrix.linear_compressibility((np.pi/2.0, x))), theta_array))
     linear_compressibility_neg_xz = list(
-        map(lambda x: max(0.0, -stiffness_matrix.linear_compressibility((x, 0.0)), theta_array)))
+        map(lambda x: max(0.0, -stiffness_matrix.linear_compressibility((x, 0.0))), theta_array))
     linear_compressibility_neg_yz = list(
-        map(lambda x: max(0.0, -stiffness_matrix.linear_compressibility((x, np.pi/2.0)), theta_array)))
+        map(lambda x: max(0.0, -stiffness_matrix.linear_compressibility((x, np.pi/2.0))), theta_array))
 
     data_x_xy_neg = linear_compressibility_neg_xy*np.cos(theta_array)
     data_y_xy_neg = linear_compressibility_neg_xy*np.sin(theta_array)
@@ -393,12 +393,12 @@ def plot_poisson_2d(stiffness_matrix: StiffnessTensor) -> None:
     data_x_xz_3 = np.array([poisson[2] * np.sin(theta) for poisson, theta in zip(poisson_xz, theta_array)])
     data_y_xz_3 = np.array([poisson[2] * np.cos(theta) for poisson, theta in zip(poisson_xz, theta_array)])
 
-    data_x_yz_1 = np.array([poisson[0] * np.sin(theta) for poisson, theta in zip(poisson_xy, theta_array)])
-    data_y_yz_1 = np.array([poisson[0] * np.cos(theta) for poisson, theta in zip(poisson_xy, theta_array)])
-    data_x_yz_2 = np.array([poisson[1] * np.sin(theta) for poisson, theta in zip(poisson_xy, theta_array)])
-    data_y_yz_2 = np.array([poisson[1] * np.cos(theta) for poisson, theta in zip(poisson_xy, theta_array)])
-    data_x_yz_3 = np.array([poisson[2] * np.sin(theta) for poisson, theta in zip(poisson_xy, theta_array)])
-    data_y_yz_3 = np.array([poisson[2] * np.cos(theta) for poisson, theta in zip(poisson_xy, theta_array)])
+    data_x_yz_1 = np.array([poisson[0] * np.sin(theta) for poisson, theta in zip(poisson_yz, theta_array)])
+    data_y_yz_1 = np.array([poisson[0] * np.cos(theta) for poisson, theta in zip(poisson_yz, theta_array)])
+    data_x_yz_2 = np.array([poisson[1] * np.sin(theta) for poisson, theta in zip(poisson_yz, theta_array)])
+    data_y_yz_2 = np.array([poisson[1] * np.cos(theta) for poisson, theta in zip(poisson_yz, theta_array)])
+    data_x_yz_3 = np.array([poisson[2] * np.sin(theta) for poisson, theta in zip(poisson_yz, theta_array)])
+    data_y_yz_3 = np.array([poisson[2] * np.cos(theta) for poisson, theta in zip(poisson_yz, theta_array)])
 
     fig, (ax_xy, ax_xz, ax_yz) = plt.subplots(1, 3)
     ax_xy.plot(data_x_xy_1, data_y_xy_1, 'b-')

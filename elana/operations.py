@@ -26,5 +26,6 @@ def maximize_elastic_constant_function(elastic_constant_function: Callable[[], f
     temp = minimize_elastic_constant_function(lambda x: -elastic_constant_function(x), dimension)
     return temp[0], -temp[1]
 
+#TODO Change minimize and maximize to use tuples when calling function to maximize or minimize
 
 

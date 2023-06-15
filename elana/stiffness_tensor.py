@@ -76,6 +76,8 @@ class StiffnessTensor:
         ])
         return 1 / result
 
+#TODO Implement min, max, anisotropy for young, lc, shear, poisson
+
     def linear_compressibility(self, angles: tuple[float, float]) -> float:
         direction_vector: list[float] = compute_direction_vector_spherical_to_cartesian(angles[0], angles[1])
         result: float = sum([direction_vector[i] * direction_vector[j] * self.flexibility_tensor[i][j][k][k]
