@@ -1,5 +1,5 @@
 import pytest
-from elana import StiffnessTensor
+from elana.stiffness_tensor import StiffnessTensor, _compute_4th_order_tensor_from_6x6_matrix
 
 import numpy as np
 
@@ -36,6 +36,50 @@ def test_trigonal_matrix_read_matrix_from_txt_compare_with_reference_must_return
     # assert
 
     assert (trigonal_matrix.matrix == reference_trigonal_matrix).all()
+
+
+def test_convert_to_tensor_given_diagonal_eye_matrix_must_return_corresponding_tensor() -> None:
+    stiffness_matrix = StiffnessTensor()
+    stiffness_matrix.matrix = np.eye(6)
+
+    tensor = _compute_4th_order_tensor_from_6x6_matrix(stiffness_matrix.matrix)
+
+    target_tensor = np.array([[[[1., 0., 0.],
+                                [0., 0., 0.],
+                                [0., 0., 0.]],
+                               [[0., 1., 0.],
+                                [1., 0., 0.],
+                                [0., 0., 0.]],
+                               [[0., 0., 1.],
+                                [0., 0., 0.],
+                                [1., 0., 0.]]],
+                              [[[0., 1., 0.],
+                                [1., 0., 0.],
+                                [0., 0., 0.]],
+                               [[0., 0., 0.],
+                                [0., 1., 0.],
+                                [0., 0., 0.]],
+                               [[0., 0., 0.],
+                                [0., 0., 1.],
+                                [0., 1., 0.]]],
+                              [[[0., 0., 1.],
+                                [0., 0., 0.],
+                                [1., 0., 0.]],
+                               [[0., 0., 0.],
+                                [0., 0., 1.],
+                                [0., 1., 0.]],
+                               [[0., 0., 0.],
+                                [0., 0., 0.],
+                                [0., 0., 1.]]]])
+
+    # ones_list = [tensor[0, 0, 0, 0], tensor[1, 1, 1, 1], tensor[2, 2, 2, 2], tensor[0, 1, 0, 1], tensor[1, 0, 1, 0],
+    #tensor[1, 0, 0, 1], tensor[0, 1, 1, 0], tensor[0, 2, 0, 2], tensor[2, 0, 2, 0], tensor[2, 0, 0, 2],
+    #tensor[0, 2, 2, 0], tensor[1, 2, 1, 2], tensor[2, 1, 2, 1], tensor[2, 1, 1, 2], tensor[1, 2, 2, 1]]
+
+
+    # TODO find a way to list sets of indices
+
+    assert (tensor == target_tensor).all()
 
 
 def test_voigt_averages_compare_with_reference_must_return_true(trigonal_matrix_filename: str) -> None:
