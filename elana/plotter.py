@@ -32,11 +32,14 @@ _symmetrical_blues = _symmetrical_colormap(('Blues', None))
 _symmetrical_greens = _symmetrical_colormap(('Greens', None))
 _symmetrical_reds = _symmetrical_colormap(('Reds', None))
 
-def make_planar_plot_data(data_x : npt.NDArray[np.float_], data_y : npt.NDArray[np.float_]) -> tuple[npt.NDArray[np.float_], npt.NDArray[np.float_]]:
+
+def make_planar_plot_data(data_x: npt.NDArray[np.float_], data_y: npt.NDArray[np.float_]) -> tuple[
+    npt.NDArray[np.float_], npt.NDArray[np.float_]]:
     """Prepares 2d plot data for planar plotting"""
     data_x = np.append(data_x, -data_x)
     data_y = np.append(data_y, -data_y)
     return data_x, data_y
+
 
 def plot_young_2d(stiffness_matrix: StiffnessTensor) -> None:
     """2D plotter for Young modulus"""
@@ -53,11 +56,12 @@ def plot_young_2d(stiffness_matrix: StiffnessTensor) -> None:
     data_x_xz, data_y_xz = make_planar_plot_data(young_xz * np.sin(theta_array), young_xz * np.cos(theta_array))
     data_x_yz, data_y_yz = make_planar_plot_data(young_yz * np.sin(theta_array), young_yz * np.cos(theta_array))
 
-
     fig, (ax_xy, ax_xz, ax_yz) = plt.subplots(1, 3, figsize=(55, 15))
     ax_xy.plot(data_x_xy, data_y_xy, 'g-')
+    ax_xy.grid()
     ax_xy.set_title("Young modulus on (xy) plane")
     ax_xz.plot(data_x_xz, data_y_xz, 'g-')
+    ax_xz.grid()
     ax_xz.set_title("Young modulus on (xz) plane")
     ax_yz.plot(data_x_yz, data_y_yz, 'g-')
     ax_yz.set_title("Young modulus on (yz) plane")
@@ -131,12 +135,12 @@ def plot_linear_compressibility_2d(stiffness_matrix: StiffnessTensor) -> None:
     linear_compressibility_pos_yz = list(
         map(lambda x: max(0.0, stiffness_matrix.linear_compressibility((x, np.pi / 2.0))), theta_array))
 
-    data_x_xy_pos = linear_compressibility_pos_xy * np.cos(theta_array)
-    data_y_xy_pos = linear_compressibility_pos_xy * np.sin(theta_array)
-    data_x_xz_pos = linear_compressibility_pos_xz * np.sin(theta_array)
-    data_y_xz_pos = linear_compressibility_pos_xz * np.cos(theta_array)
-    data_x_yz_pos = linear_compressibility_pos_yz * np.sin(theta_array)
-    data_y_yz_pos = linear_compressibility_pos_yz * np.cos(theta_array)
+    data_x_xy_pos, data_y_xy_pos = make_planar_plot_data(linear_compressibility_pos_xy * np.cos(theta_array),
+                                                         linear_compressibility_pos_xy * np.sin(theta_array))
+    data_x_xz_pos, data_y_xz_pos = make_planar_plot_data(linear_compressibility_pos_xz * np.sin(theta_array),
+                                                         linear_compressibility_pos_xz * np.cos(theta_array))
+    data_x_yz_pos, data_y_yz_pos = make_planar_plot_data(linear_compressibility_pos_yz * np.sin(theta_array),
+                                                         linear_compressibility_pos_yz * np.cos(theta_array))
 
     linear_compressibility_neg_xy = list(
         map(lambda x: max(0.0, -stiffness_matrix.linear_compressibility((np.pi / 2.0, x))), theta_array))
@@ -145,22 +149,25 @@ def plot_linear_compressibility_2d(stiffness_matrix: StiffnessTensor) -> None:
     linear_compressibility_neg_yz = list(
         map(lambda x: max(0.0, -stiffness_matrix.linear_compressibility((x, np.pi / 2.0))), theta_array))
 
-    data_x_xy_neg = linear_compressibility_neg_xy * np.cos(theta_array)
-    data_y_xy_neg = linear_compressibility_neg_xy * np.sin(theta_array)
-    data_x_xz_neg = linear_compressibility_neg_xz * np.sin(theta_array)
-    data_y_xz_neg = linear_compressibility_neg_xz * np.cos(theta_array)
-    data_x_yz_neg = linear_compressibility_neg_yz * np.sin(theta_array)
-    data_y_yz_neg = linear_compressibility_neg_yz * np.cos(theta_array)
+    data_x_xy_neg, data_y_xy_neg = make_planar_plot_data(linear_compressibility_neg_xy * np.cos(theta_array),
+                                                         linear_compressibility_neg_xy * np.sin(theta_array))
+    data_x_xz_neg, data_y_xz_neg = make_planar_plot_data(linear_compressibility_neg_xz * np.sin(theta_array),
+                                                         linear_compressibility_neg_xz * np.cos(theta_array))
+    data_x_yz_neg, data_y_yz_neg = make_planar_plot_data(linear_compressibility_neg_yz * np.sin(theta_array),
+                                                         linear_compressibility_neg_yz * np.cos(theta_array))
 
     fig, (ax_xy, ax_xz, ax_yz) = plt.subplots(1, 3, figsize=(55, 15))
     ax_xy.plot(data_x_xy_pos, data_y_xy_pos, 'g-')
     ax_xy.plot(data_x_xy_neg, data_y_xy_neg, 'r-')
+    ax_xy.grid()
     ax_xy.set_title("Linear compressibility on (xy) plane")
     ax_xz.plot(data_x_xz_pos, data_y_xz_pos, 'g-')
     ax_xz.plot(data_x_xz_neg, data_y_xz_neg, 'r-')
+    ax_xz.grid()
     ax_xz.set_title("Linear compressibility on (xz) plane")
     ax_yz.plot(data_x_yz_pos, data_y_yz_pos, 'g-')
     ax_yz.plot(data_x_yz_neg, data_y_yz_neg, 'r-')
+    ax_yz.grid()
     ax_yz.set_title("Linear compressibility on (yz) plane")
 
     plt.savefig("planar_linear_compressibility.png")
@@ -252,30 +259,39 @@ def plot_shear_modulus_2d(stiffness_matrix: StiffnessTensor) -> None:
     shear_xz = list(map(lambda x: stiffness_matrix.shear_2d((x, 0.0)), theta_array))
     shear_yz = list(map(lambda x: stiffness_matrix.shear_2d((x, np.pi / 2.0)), theta_array))
 
-    data_x_xy_min = np.array([shear[0] * np.cos(theta) for shear, theta in zip(shear_xy, theta_array)])
-    data_y_xy_min = np.array([shear[0] * np.sin(theta) for shear, theta in zip(shear_xy, theta_array)])
-    data_x_xy_max = np.array([shear[1] * np.cos(theta) for shear, theta in zip(shear_xy, theta_array)])
-    data_y_xy_max = np.array([shear[1] * np.sin(theta) for shear, theta in zip(shear_xy, theta_array)])
+    data_x_xy_min, data_y_xy_min = make_planar_plot_data(
+        np.array([shear[0] * np.cos(theta) for shear, theta in zip(shear_xy, theta_array)]),
+        np.array([shear[0] * np.sin(theta) for shear, theta in zip(shear_xy, theta_array)]))
+    data_x_xy_max, data_y_xy_max = make_planar_plot_data(
+        np.array([shear[1] * np.cos(theta) for shear, theta in zip(shear_xy, theta_array)]),
+        np.array([shear[1] * np.sin(theta) for shear, theta in zip(shear_xy, theta_array)]))
 
-    data_x_xz_min = np.array([shear[0] * np.sin(theta) for shear, theta in zip(shear_xz, theta_array)])
-    data_y_xz_min = np.array([shear[0] * np.cos(theta) for shear, theta in zip(shear_xz, theta_array)])
-    data_x_xz_max = np.array([shear[1] * np.sin(theta) for shear, theta in zip(shear_xz, theta_array)])
-    data_y_xz_max = np.array([shear[1] * np.cos(theta) for shear, theta in zip(shear_xz, theta_array)])
+    data_x_xz_min, data_y_xz_min = make_planar_plot_data(
+        np.array([shear[0] * np.sin(theta) for shear, theta in zip(shear_xz, theta_array)]),
+        np.array([shear[0] * np.cos(theta) for shear, theta in zip(shear_xz, theta_array)]))
+    data_x_xz_max, data_y_xz_max = make_planar_plot_data(
+        np.array([shear[1] * np.sin(theta) for shear, theta in zip(shear_xz, theta_array)]),
+        np.array([shear[1] * np.cos(theta) for shear, theta in zip(shear_xz, theta_array)]))
 
-    data_x_yz_min = np.array([shear[0] * np.sin(theta) for shear, theta in zip(shear_yz, theta_array)])
-    data_y_yz_min = np.array([shear[0] * np.cos(theta) for shear, theta in zip(shear_yz, theta_array)])
-    data_x_yz_max = np.array([shear[1] * np.sin(theta) for shear, theta in zip(shear_yz, theta_array)])
-    data_y_yz_max = np.array([shear[1] * np.cos(theta) for shear, theta in zip(shear_yz, theta_array)])
+    data_x_yz_min, data_y_yz_min = make_planar_plot_data(
+        np.array([shear[0] * np.sin(theta) for shear, theta in zip(shear_yz, theta_array)]),
+        np.array([shear[0] * np.cos(theta) for shear, theta in zip(shear_yz, theta_array)]))
+    data_x_yz_max, data_y_yz_max = make_planar_plot_data(
+        np.array([shear[1] * np.sin(theta) for shear, theta in zip(shear_yz, theta_array)]),
+        np.array([shear[1] * np.cos(theta) for shear, theta in zip(shear_yz, theta_array)]))
 
     fig, (ax_xy, ax_xz, ax_yz) = plt.subplots(1, 3, figsize=(55, 15))
     ax_xy.plot(data_x_xy_max, data_y_xy_max, 'b-')
     ax_xy.plot(data_x_xy_min, data_y_xy_min, 'g-')
+    ax_xy.grid()
     ax_xy.set_title("Shear modulus on (xy) plane")
     ax_xz.plot(data_x_xz_max, data_y_xz_max, 'b-')
     ax_xz.plot(data_x_xz_min, data_y_xz_min, 'g-')
+    ax_xz.grid()
     ax_xz.set_title("Shear modulus on (xz) plane")
     ax_yz.plot(data_x_yz_max, data_y_yz_max, 'b-')
     ax_yz.plot(data_x_yz_min, data_y_yz_min, 'g-')
+    ax_yz.grid()
     ax_yz.set_title("Shear modulus on (yz) plane")
 
     plt.savefig("planar_shear_modulus.png")
@@ -380,40 +396,35 @@ def plot_poisson_2d(stiffness_matrix: StiffnessTensor) -> None:
     poisson_xz = list(map(lambda x: stiffness_matrix.poisson_2d((x, 0.0)), theta_array))
     poisson_yz = list(map(lambda x: stiffness_matrix.poisson_2d((x, np.pi / 2.0)), theta_array))
 
-    data_x_xy_1 = np.array([poisson[0] * np.cos(theta) for poisson, theta in zip(poisson_xy, theta_array)])
-    data_y_xy_1 = np.array([poisson[0] * np.sin(theta) for poisson, theta in zip(poisson_xy, theta_array)])
-    data_x_xy_2 = np.array([poisson[1] * np.cos(theta) for poisson, theta in zip(poisson_xy, theta_array)])
-    data_y_xy_2 = np.array([poisson[1] * np.sin(theta) for poisson, theta in zip(poisson_xy, theta_array)])
-    data_x_xy_3 = np.array([poisson[2] * np.cos(theta) for poisson, theta in zip(poisson_xy, theta_array)])
-    data_y_xy_3 = np.array([poisson[2] * np.sin(theta) for poisson, theta in zip(poisson_xy, theta_array)])
+    data_x_xy_1, data_y_xy_1 = make_planar_plot_data(np.array([poisson[0] * np.cos(theta) for poisson, theta in zip(poisson_xy, theta_array)]), np.array([poisson[0] * np.sin(theta) for poisson, theta in zip(poisson_xy, theta_array)]))
+    data_x_xy_2, data_y_xy_2 = make_planar_plot_data(np.array([poisson[1] * np.cos(theta) for poisson, theta in zip(poisson_xy, theta_array)]), np.array([poisson[1] * np.sin(theta) for poisson, theta in zip(poisson_xy, theta_array)]))
+    data_x_xy_3, data_y_xy_3 = make_planar_plot_data(np.array([poisson[2] * np.cos(theta) for poisson, theta in zip(poisson_xy, theta_array)]), np.array([poisson[2] * np.sin(theta) for poisson, theta in zip(poisson_xy, theta_array)]))
 
-    data_x_xz_1 = np.array([poisson[0] * np.sin(theta) for poisson, theta in zip(poisson_xz, theta_array)])
-    data_y_xz_1 = np.array([poisson[0] * np.cos(theta) for poisson, theta in zip(poisson_xz, theta_array)])
-    data_x_xz_2 = np.array([poisson[1] * np.sin(theta) for poisson, theta in zip(poisson_xz, theta_array)])
-    data_y_xz_2 = np.array([poisson[1] * np.cos(theta) for poisson, theta in zip(poisson_xz, theta_array)])
-    data_x_xz_3 = np.array([poisson[2] * np.sin(theta) for poisson, theta in zip(poisson_xz, theta_array)])
-    data_y_xz_3 = np.array([poisson[2] * np.cos(theta) for poisson, theta in zip(poisson_xz, theta_array)])
+    data_x_xz_1, data_y_xz_1 = make_planar_plot_data(np.array([poisson[0] * np.sin(theta) for poisson, theta in zip(poisson_xz, theta_array)]), np.array([poisson[0] * np.cos(theta) for poisson, theta in zip(poisson_xz, theta_array)]))
+    data_x_xz_2, data_y_xz_2 = make_planar_plot_data(np.array([poisson[1] * np.sin(theta) for poisson, theta in zip(poisson_xz, theta_array)]), np.array([poisson[1] * np.cos(theta) for poisson, theta in zip(poisson_xz, theta_array)]))
+    data_x_xz_3, data_y_xz_3 = make_planar_plot_data(np.array([poisson[2] * np.sin(theta) for poisson, theta in zip(poisson_xz, theta_array)]), np.array([poisson[2] * np.cos(theta) for poisson, theta in zip(poisson_xz, theta_array)]))
 
-    data_x_yz_1 = np.array([poisson[0] * np.sin(theta) for poisson, theta in zip(poisson_yz, theta_array)])
-    data_y_yz_1 = np.array([poisson[0] * np.cos(theta) for poisson, theta in zip(poisson_yz, theta_array)])
-    data_x_yz_2 = np.array([poisson[1] * np.sin(theta) for poisson, theta in zip(poisson_yz, theta_array)])
-    data_y_yz_2 = np.array([poisson[1] * np.cos(theta) for poisson, theta in zip(poisson_yz, theta_array)])
-    data_x_yz_3 = np.array([poisson[2] * np.sin(theta) for poisson, theta in zip(poisson_yz, theta_array)])
-    data_y_yz_3 = np.array([poisson[2] * np.cos(theta) for poisson, theta in zip(poisson_yz, theta_array)])
+    data_x_yz_1, data_y_yz_1 = make_planar_plot_data(np.array([poisson[0] * np.sin(theta) for poisson, theta in zip(poisson_yz, theta_array)]), np.array([poisson[0] * np.cos(theta) for poisson, theta in zip(poisson_yz, theta_array)]))
+    data_x_yz_2, data_y_yz_2 = make_planar_plot_data(np.array([poisson[1] * np.sin(theta) for poisson, theta in zip(poisson_yz, theta_array)]), np.array([poisson[1] * np.cos(theta) for poisson, theta in zip(poisson_yz, theta_array)]))
+    data_x_yz_3, data_y_yz_3 = make_planar_plot_data(np.array([poisson[2] * np.sin(theta) for poisson, theta in zip(poisson_yz, theta_array)]), np.array([poisson[2] * np.cos(theta) for poisson, theta in zip(poisson_yz, theta_array)]))
 
     fig, (ax_xy, ax_xz, ax_yz) = plt.subplots(1, 3, figsize=(55, 15))
-    ax_xy.plot(data_x_xy_1, data_y_xy_1, 'b-')
+    ax_xy.plot(data_x_xy_1, data_y_xy_1, 'r-')
     ax_xy.plot(data_x_xy_2, data_y_xy_2, 'g-')
-    ax_xy.plot(data_x_xy_3, data_y_xy_3, 'r-')
+    ax_xy.plot(data_x_xy_3, data_y_xy_3, 'b-')
+    ax_xy.grid()
     ax_xy.set_title("Poisson coefficient on (xy) plane")
-    ax_xz.plot(data_x_xz_1, data_y_xz_1, 'b-')
+    ax_xz.plot(data_x_xz_1, data_y_xz_1, 'r-')
     ax_xz.plot(data_x_xz_2, data_y_xz_2, 'g-')
-    ax_xz.plot(data_x_xz_3, data_y_xz_3, 'r-')
+    ax_xz.plot(data_x_xz_3, data_y_xz_3, 'b-')
+    ax_xz.grid()
     ax_xz.set_title("Poisson coefficient on (xz) plane")
-    ax_yz.plot(data_x_yz_1, data_y_yz_1, 'b-')
+    ax_yz.plot(data_x_yz_1, data_y_yz_1, 'r-')
     ax_yz.plot(data_x_yz_2, data_y_yz_2, 'g-')
-    ax_yz.plot(data_x_yz_3, data_y_yz_3, 'g-')
+    ax_yz.plot(data_x_yz_3, data_y_yz_3, 'b-')
+    ax_yz.plot()
     ax_yz.set_title("Poisson coefficient on (yz) plane")
+    plt.grid()
 
     plt.savefig("planar_poisson_coefficient.png")
     plt.show()
