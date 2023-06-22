@@ -103,9 +103,9 @@ def plot_young_3d(stiffness_matrix: StiffnessTensor) -> None:
 
     norm = colors.Normalize(vmin=young_min, vmax=young_max, clip=False)
 
-    axes.plot_surface(data_x, data_y, data_z, norm=norm, cmap='viridis')
+    axes.plot_surface(data_x, data_y, data_z, norm=norm, cmap='summer')
 
-    scalarmap = cm.ScalarMappable(cmap='viridis', norm=norm)
+    scalarmap = cm.ScalarMappable(cmap='summer', norm=norm)
     scalarmap.set_clim(young_min, young_max)
 
     cbar = plt.colorbar(scalarmap, orientation="horizontal", fraction=0.06, pad=-0.1,
@@ -219,8 +219,8 @@ def plot_linear_compressibility_3d(stiffness_matrix: StiffnessTensor) -> None:
             data_y_neg[index_theta][index_phi] = y_neg
             data_z_neg[index_theta][index_phi] = z_neg
 
-    linear_compressibility_max = max(data_linear_compressibility_pos)
-    linear_compressibility_min = min(data_linear_compressibility_neg)
+    linear_compressibility_max = np.max(data_linear_compressibility_pos)
+    linear_compressibility_min = np.min(data_linear_compressibility_neg)
 
     plt.figure()
     axes = plt.axes(projection='3d')
@@ -462,22 +462,22 @@ def plot_poisson_3d(stiffness_matrix: StiffnessTensor) -> None:
             y = np.sin(theta_array[index_theta]) * np.sin(phi_array[index_phi])
 
             poisson_1 = poisson[0]
-            data_poisson_1[(theta_array[index_theta], phi_array[index_phi])] = poisson_1
-            data_x_poisson_1[(theta_array[index_theta], phi_array[index_phi])] = poisson_1 * x
-            data_y_poisson_1[(theta_array[index_theta], phi_array[index_phi])] = poisson_1 * y
-            data_z_poisson_1[(theta_array[index_theta], phi_array[index_phi])] = poisson_1 * z
+            data_poisson_1[index_theta, index_phi] = poisson_1
+            data_x_poisson_1[index_theta, index_phi] = poisson_1 * x
+            data_y_poisson_1[index_theta, index_phi] = poisson_1 * y
+            data_z_poisson_1[index_theta, index_phi] = poisson_1 * z
 
             poisson_2 = poisson[1]
-            data_poisson_2[(theta_array[index_theta], phi_array[index_phi])] = poisson_2
-            data_x_poisson_2[(theta_array[index_theta], phi_array[index_phi])] = poisson_2 * x
-            data_y_poisson_2[(theta_array[index_theta], phi_array[index_phi])] = poisson_2 * y
-            data_z_poisson_2[(theta_array[index_theta], phi_array[index_phi])] = poisson_2 * z
+            data_poisson_2[index_theta, index_phi] = poisson_2
+            data_x_poisson_2[index_theta, index_phi] = poisson_2 * x
+            data_y_poisson_2[index_theta, index_phi] = poisson_2 * y
+            data_z_poisson_2[index_theta, index_phi] = poisson_2 * z
 
             poisson_3 = poisson[2]
-            data_poisson_3[(theta_array[index_theta], phi_array[index_phi])] = poisson_3
-            data_x_poisson_3[(theta_array[index_theta], phi_array[index_phi])] = poisson_3 * x
-            data_y_poisson_3[(theta_array[index_theta], phi_array[index_phi])] = poisson_3 * y
-            data_z_poisson_3[(theta_array[index_theta], phi_array[index_phi])] = poisson_3 * z
+            data_poisson_3[index_theta, index_phi] = poisson_3
+            data_x_poisson_3[index_theta, index_phi] = poisson_3 * x
+            data_y_poisson_3[index_theta, index_phi] = poisson_3 * y
+            data_z_poisson_3[index_theta, index_phi] = poisson_3 * z
 
     poisson_1_average = np.average(data_poisson_1)
     poisson_1_min = np.min(data_poisson_1)
@@ -499,20 +499,20 @@ def plot_poisson_3d(stiffness_matrix: StiffnessTensor) -> None:
     norm_poisson_3 = colors.Normalize(vmin=poisson_3_min, vmax=poisson_3_max, clip=False)
 
     axes.plot_surface(data_x_poisson_1, data_y_poisson_1, data_z_poisson_1, norm=norm_poisson_1,
-                      cmap=_symmetrical_greens)
+                      cmap=_symmetrical_reds)
     axes.plot_surface(data_x_poisson_2, data_y_poisson_2, data_z_poisson_2, norm=norm_poisson_2,
-                      cmap=_symmetrical_blues,
+                      cmap=_symmetrical_greens,
                       alpha=0.5)
-    axes.plot_surface(data_x_poisson_3, data_y_poisson_3, data_z_poisson_3, norm=norm_poisson_3, cmap=_symmetrical_reds,
+    axes.plot_surface(data_x_poisson_3, data_y_poisson_3, data_z_poisson_3, norm=norm_poisson_3, cmap=_symmetrical_blues,
                       alpha=0.5)
 
-    scalarmap_poisson_1 = cm.ScalarMappable(cmap=_symmetrical_greens, norm=norm_poisson_1)
+    scalarmap_poisson_1 = cm.ScalarMappable(cmap=_symmetrical_reds, norm=norm_poisson_1)
     scalarmap_poisson_1.set_clim(poisson_1_min, poisson_1_max)
 
-    scalarmap_poisson_2 = cm.ScalarMappable(cmap=_symmetrical_blues, norm=norm_poisson_2)
+    scalarmap_poisson_2 = cm.ScalarMappable(cmap=_symmetrical_greens, norm=norm_poisson_2)
     scalarmap_poisson_2.set_clim(poisson_2_min, poisson_2_max)
 
-    scalarmap_poisson_3 = cm.ScalarMappable(cmap=_symmetrical_reds, norm=norm_poisson_3)
+    scalarmap_poisson_3 = cm.ScalarMappable(cmap=_symmetrical_blues, norm=norm_poisson_3)
     scalarmap_poisson_3.set_clim(poisson_3_min, poisson_3_max)
 
     cbar_poisson_1 = plt.colorbar(scalarmap_poisson_1, location="bottom", orientation="horizontal", fraction=0.06,
