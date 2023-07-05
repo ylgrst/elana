@@ -100,20 +100,24 @@ def plot_young_3d(stiffness_matrix: StiffnessTensor) -> None:
 
     plt.figure()
     axes = plt.axes(projection='3d')
+    axes.set_xlabel('x')
+    axes.set_ylabel('y')
+    axes.set_zlabel('z')
+    axes.set_title(r'Directional stiffness $E$ (MPa)')
 
     norm = colors.Normalize(vmin=young_min, vmax=young_max, clip=False)
 
-    axes.plot_surface(data_x, data_y, data_z, norm=norm, cmap='summer')
-
     scalarmap = cm.ScalarMappable(cmap='summer', norm=norm)
     scalarmap.set_clim(young_min, young_max)
+    scalarmap.set_array([])
+    fcolors = scalarmap.to_rgba(data_young)
 
-    cbar = plt.colorbar(scalarmap, orientation="horizontal", fraction=0.06, pad=-0.1,
+
+    cbar = plt.colorbar(scalarmap, orientation="horizontal", fraction=0.05, pad=0.1,
                         ticks=[young_min, young_average, young_max])
     cbar.ax.tick_params(labelsize='large')
-    cbar.set_label(r'directional stiffness $E$ (MPa)', size=15, labelpad=20)
 
-    axes.figure.axes[1].tick_params(axis="x", labelsize=20)
+    axes.plot_surface(data_x, data_y, data_z, facecolors=fcolors, norm=norm, cmap='summer', linewidth=0.1, edgecolor = 'k', alpha=0.8)
     axes.azim = 30
     axes.elev = 30
 
@@ -219,28 +223,42 @@ def plot_linear_compressibility_3d(stiffness_matrix: StiffnessTensor) -> None:
             data_y_neg[index_theta][index_phi] = y_neg
             data_z_neg[index_theta][index_phi] = z_neg
 
-    linear_compressibility_max = np.max(data_linear_compressibility_pos)
-    linear_compressibility_min = np.min(data_linear_compressibility_neg)
+    linear_compressibility_pos_max = np.max(data_linear_compressibility_pos)
+    linear_compressibility_pos_min = np.min(data_linear_compressibility_pos)
+    linear_compressibility_neg_max = np.max(data_linear_compressibility_neg)
+    linear_compressibility_neg_min = np.min(data_linear_compressibility_neg)
 
-    plt.figure()
+    plt.figure(figsize=(10,10))
     axes = plt.axes(projection='3d')
+    axes.set_xlabel('x')
+    axes.set_ylabel('y')
+    axes.set_zlabel('z')
+    axes.set_title(r'Directional linear compressibility $LC$ (TPa $^{-1}$)')
 
-    norm_pos = colors.Normalize(vmin=0.0, vmax=linear_compressibility_max, clip=False)
-    norm_neg = colors.Normalize(vmin=linear_compressibility_min, vmax=0.0, clip=False)
-    norm = colors.Normalize(vmin=linear_compressibility_min, vmax=linear_compressibility_max, clip=False)
+    norm_pos = colors.Normalize(vmin=linear_compressibility_pos_min, vmax=linear_compressibility_pos_max, clip=False)
+    norm_neg = colors.Normalize(vmin=linear_compressibility_neg_min, vmax=linear_compressibility_neg_max, clip=False)
 
-    axes.plot_surface(data_x_pos, data_y_pos, data_z_pos, norm=norm_pos, cmap='viridis')
-    axes.plot_surface(data_x_neg, data_y_neg, data_z_neg, norm=norm_neg, cmap='viridis')
+    scalarmap_pos = cm.ScalarMappable(cmap='Greens', norm=norm_pos)
+    scalarmap_pos.set_clim(linear_compressibility_pos_min, linear_compressibility_pos_max)
+    scalarmap_pos.set_array([])
+    fcolors_pos = scalarmap_pos.to_rgba(data_linear_compressibility_pos)
 
-    scalarmap = cm.ScalarMappable(cmap=_symmetrical_viridis, norm=norm)
-    scalarmap.set_clim(linear_compressibility_min, linear_compressibility_max)
+    cbar_pos = plt.colorbar(scalarmap_pos, orientation="horizontal", pad=0.05, shrink=0.6,
+                        ticks=[linear_compressibility_pos_min, linear_compressibility_pos_max])
+    cbar_pos.ax.tick_params(labelsize='large')
 
-    cbar = plt.colorbar(scalarmap, orientation="horizontal", fraction=0.06, pad=-0.1,
-                        ticks=[linear_compressibility_min, 0.0, linear_compressibility_max])
-    cbar.ax.tick_params(labelsize='large')
-    cbar.set_label(r'directional linear compressibility $LC$ (MPa $^{-1}$)', size=15, labelpad=20)
+    scalarmap_neg = cm.ScalarMappable(cmap='Reds', norm=norm_neg)
+    scalarmap_neg.set_clim(linear_compressibility_neg_min, linear_compressibility_neg_max)
+    scalarmap_neg.set_array([])
+    fcolors_neg = scalarmap_neg.to_rgba(data_linear_compressibility_neg)
 
-    axes.figure.axes[1].tick_params(axis="x", labelsize=20)
+    cbar_neg = plt.colorbar(scalarmap_neg, orientation="horizontal", pad=0.08, shrink=0.6,
+                        ticks=[linear_compressibility_neg_min, linear_compressibility_neg_max])
+    cbar_neg.ax.tick_params(labelsize='large')
+
+    axes.plot_surface(data_x_pos, data_y_pos, data_z_pos, facecolors=fcolors_pos, norm=norm_pos, cmap='Greens', linewidth=0.1, edgecolor = 'k', alpha=0.8)
+    axes.plot_surface(data_x_neg, data_y_neg, data_z_neg, facecolors=fcolors_neg, norm=norm_neg, cmap='Reds', linewidth=0.1, edgecolor = 'k', alpha=0.8)
+
     axes.azim = 30
     axes.elev = 30
 
@@ -301,7 +319,7 @@ def plot_shear_modulus_2d(stiffness_matrix: StiffnessTensor) -> None:
 def plot_shear_modulus_3d(stiffness_matrix: StiffnessTensor) -> None:
     """3D plotter for shear modulus"""
 
-    n_points = 200
+    n_points = 100
 
     theta_array = np.linspace(0.0, np.pi, n_points)
     phi_array = np.linspace(0.0, np.pi, n_points)
@@ -351,33 +369,38 @@ def plot_shear_modulus_3d(stiffness_matrix: StiffnessTensor) -> None:
     shear_max_min = np.min(data_shear_max)
     shear_max_max = np.max(data_shear_max)
 
-    plt.figure()
+    plt.figure(figsize=(10,10))
     axes = plt.axes(projection='3d')
+    axes.set_xlabel('x')
+    axes.set_ylabel('y')
+    axes.set_zlabel('z')
+    axes.set_title(r'Directional shear modulus $G_{max}$ (MPa)')
 
     norm_min = colors.Normalize(vmin=shear_min_min, vmax=shear_min_max, clip=False)
     norm_max = colors.Normalize(vmin=shear_max_min, vmax=shear_max_max, clip=False)
 
-    axes.plot_surface(data_x_shear_min, data_y_shear_min, data_z_shear_min, norm=norm_min, cmap=_symmetrical_greens)
-    axes.plot_surface(data_x_shear_max, data_y_shear_max, data_z_shear_max, norm=norm_max, cmap=_symmetrical_blues,
+    scalarmap_shear_min = cm.ScalarMappable(cmap="Greens", norm=norm_min)
+    scalarmap_shear_min.set_clim(shear_min_min, shear_min_max)
+    scalarmap_shear_min.set_array([])
+    fcolors_shear_min = scalarmap_shear_min.to_rgba(data_shear_min)
+
+    scalarmap_shear_max = cm.ScalarMappable(cmap="Blues", norm=norm_max)
+    scalarmap_shear_max.set_clim(shear_max_min, shear_max_max)
+    scalarmap_shear_max.set_array([])
+    fcolors_shear_max = scalarmap_shear_max.to_rgba(data_shear_max)
+
+    axes.plot_surface(data_x_shear_min, data_y_shear_min, data_z_shear_min, facecolors=fcolors_shear_min, norm=norm_min, cmap="Greens", linewidth=0.05, edgecolor = 'k', alpha=0.8)
+    axes.plot_surface(data_x_shear_max, data_y_shear_max, data_z_shear_max, facecolors=fcolors_shear_max, norm=norm_max, cmap="Blues", linewidth=0.05, edgecolor = 'k',
                       alpha=0.5)
 
-    scalarmap_shear_min = cm.ScalarMappable(cmap=_symmetrical_greens, norm=norm_min)
-    scalarmap_shear_min.set_clim(shear_min_min, shear_min_max)
-
-    scalarmap_shear_max = cm.ScalarMappable(cmap=_symmetrical_blues, norm=norm_max)
-    scalarmap_shear_max.set_clim(shear_max_min, shear_max_max)
-
-    cbar_min = plt.colorbar(scalarmap_shear_min, location="bottom", orientation="horizontal", fraction=0.06, pad=-0.1,
+    cbar_min = plt.colorbar(scalarmap_shear_min, orientation="horizontal", pad=0.05, shrink=0.6,
                             ticks=[shear_min_min, shear_min_average, shear_min_max])
     cbar_min.ax.tick_params(labelsize='large')
-    cbar_min.set_label(r'directional shear modulus $G_{min}$ (MPa)', size=15, labelpad=20)
 
-    cbar_max = plt.colorbar(scalarmap_shear_max, location="top", orientation="horizontal", fraction=0.06, pad=-0.1,
+    cbar_max = plt.colorbar(scalarmap_shear_max, orientation="horizontal", pad=0.08, shrink=0.6,
                             ticks=[shear_max_min, shear_max_average, shear_max_max])
     cbar_max.ax.tick_params(labelsize='large')
-    cbar_max.set_label(r'directional shear modulus $G_{max}$ (MPa)', size=15, labelpad=20)
 
-    axes.figure.axes[1].tick_params(axis="x", labelsize=20)
     axes.azim = 30
     axes.elev = 30
 
@@ -433,7 +456,7 @@ def plot_poisson_2d(stiffness_matrix: StiffnessTensor) -> None:
 def plot_poisson_3d(stiffness_matrix: StiffnessTensor) -> None:
     """3D plotter for Poisson coefficient"""
 
-    n_points = 200
+    n_points = 50
 
     theta_array = np.linspace(0.0, np.pi, n_points)
     phi_array = np.linspace(0.0, np.pi, n_points)
@@ -491,49 +514,52 @@ def plot_poisson_3d(stiffness_matrix: StiffnessTensor) -> None:
     poisson_3_min = np.min(data_poisson_3)
     poisson_3_max = np.max(data_poisson_3)
 
-    plt.figure()
+    plt.figure(figsize=(12,12))
     axes = plt.axes(projection='3d')
+    axes.set_xlabel('x')
+    axes.set_ylabel('y')
+    axes.set_zlabel('z')
+    axes.set_title(r'Directional Poisson coefficient ' + "\u03BD")
 
     norm_poisson_1 = colors.Normalize(vmin=poisson_1_min, vmax=poisson_1_max, clip=False)
     norm_poisson_2 = colors.Normalize(vmin=poisson_2_min, vmax=poisson_2_max, clip=False)
     norm_poisson_3 = colors.Normalize(vmin=poisson_3_min, vmax=poisson_3_max, clip=False)
 
-    axes.plot_surface(data_x_poisson_1, data_y_poisson_1, data_z_poisson_1, norm=norm_poisson_1,
-                      cmap=_symmetrical_reds)
-    axes.plot_surface(data_x_poisson_2, data_y_poisson_2, data_z_poisson_2, norm=norm_poisson_2,
-                      cmap=_symmetrical_greens,
-                      alpha=0.5)
-    axes.plot_surface(data_x_poisson_3, data_y_poisson_3, data_z_poisson_3, norm=norm_poisson_3, cmap=_symmetrical_blues,
-                      alpha=0.5)
-
-    scalarmap_poisson_1 = cm.ScalarMappable(cmap=_symmetrical_reds, norm=norm_poisson_1)
+    scalarmap_poisson_1 = cm.ScalarMappable(cmap="Reds", norm=norm_poisson_1)
     scalarmap_poisson_1.set_clim(poisson_1_min, poisson_1_max)
+    scalarmap_poisson_1.set_array([])
+    fcolors_poisson_1 = scalarmap_poisson_1.to_rgba(data_poisson_1)
 
-    scalarmap_poisson_2 = cm.ScalarMappable(cmap=_symmetrical_greens, norm=norm_poisson_2)
+    scalarmap_poisson_2 = cm.ScalarMappable(cmap="Greens", norm=norm_poisson_2)
     scalarmap_poisson_2.set_clim(poisson_2_min, poisson_2_max)
+    scalarmap_poisson_2.set_array([])
+    fcolors_poisson_2 = scalarmap_poisson_2.to_rgba(data_poisson_2)
 
-    scalarmap_poisson_3 = cm.ScalarMappable(cmap=_symmetrical_blues, norm=norm_poisson_3)
+    scalarmap_poisson_3 = cm.ScalarMappable(cmap="Blues", norm=norm_poisson_3)
     scalarmap_poisson_3.set_clim(poisson_3_min, poisson_3_max)
+    scalarmap_poisson_3.set_array([])
+    fcolors_poisson_3 = scalarmap_poisson_3.to_rgba(data_poisson_3)
 
-    cbar_poisson_1 = plt.colorbar(scalarmap_poisson_1, location="bottom", orientation="horizontal", fraction=0.06,
-                                  pad=-0.1,
+    axes.plot_surface(data_x_poisson_1, data_y_poisson_1, data_z_poisson_1, facecolors=fcolors_poisson_1, norm=norm_poisson_1,
+                      cmap="Reds", linewidth=0.1, edgecolor = 'k')
+    axes.plot_surface(data_x_poisson_2, data_y_poisson_2, data_z_poisson_2, facecolors=fcolors_poisson_2, norm=norm_poisson_2,
+                      cmap="Greens",
+                      alpha=0.5, linewidth=0.1, edgecolor = 'k')
+    axes.plot_surface(data_x_poisson_3, data_y_poisson_3, data_z_poisson_3, facecolors=fcolors_poisson_3, norm=norm_poisson_3, cmap="Blues",
+                      alpha=0.5, linewidth=0.1, edgecolor = 'k')
+
+    cbar_poisson_1 = plt.colorbar(scalarmap_poisson_1, pad=0.06, orientation="horizontal", shrink=0.6,
                                   ticks=[poisson_1_min, poisson_1_average, poisson_1_max])
     cbar_poisson_1.ax.tick_params(labelsize='large')
-    cbar_poisson_1.set_label(r'Poisson coefficient ' + "\u03BD", size=15, labelpad=20)
 
-    cbar_poisson_2 = plt.colorbar(scalarmap_poisson_2, location="bottom", orientation="horizontal", fraction=0.06,
-                                  pad=-0.1,
+    cbar_poisson_2 = plt.colorbar(scalarmap_poisson_2, pad=0.07, orientation="horizontal", shrink=0.6,
                                   ticks=[poisson_2_min, poisson_2_average, poisson_2_max])
     cbar_poisson_2.ax.tick_params(labelsize='large')
-    cbar_poisson_2.set_label(r'Poisson coefficient ' + "\u03BD", size=15, labelpad=20)
 
-    cbar_poisson_3 = plt.colorbar(scalarmap_poisson_3, location="bottom", orientation="horizontal", fraction=0.06,
-                                  pad=-0.1,
+    cbar_poisson_3 = plt.colorbar(scalarmap_poisson_3, pad=0.075, orientation="horizontal", shrink=0.6,
                                   ticks=[poisson_3_min, poisson_3_average, poisson_3_max])
     cbar_poisson_3.ax.tick_params(labelsize='large')
-    cbar_poisson_3.set_label(r'Poisson coefficient ' + "\u03BD", size=15, labelpad=20)
 
-    axes.figure.axes[1].tick_params(axis="x", labelsize=20)
     axes.azim = 30
     axes.elev = 30
 
