@@ -1,45 +1,11 @@
 import pytest
-from elana.stiffness_tensor import StiffnessTensor, _compute_4th_order_tensor_from_6x6_matrix
+from elana.anisotropic_stiffness_tensor import AnisotropicStiffnessTensor, _compute_4th_order_tensor_from_6x6_matrix
 
 import numpy as np
 
-from pathlib import Path
-
-
-@pytest.fixture(scope="function")
-def tmp_dir(tmp_path_factory: pytest.TempPathFactory) -> Path:
-    tmp_dir_name = "test_tmp_dir"
-    return tmp_path_factory.mktemp(tmp_dir_name)
-
-
-@pytest.fixture(scope="function")
-def trigonal_matrix_filename() -> str:
-    return 'trigonal_stiffness_matrix.txt'
-
-
-def test_trigonal_matrix_read_matrix_from_txt_compare_with_reference_must_return_true(
-        trigonal_matrix_filename: str) -> None:
-    # arrange
-
-    trigonal_matrix = StiffnessTensor()
-    reference_trigonal_matrix = np.array([[87.64, 6.99, 11.91, -17.19, 0.0, 0.0],
-                                          [6.99, 87.64, 11.91, 17.19, 0.0, 0.0],
-                                          [11.91, 11.91, 107.2, 0.0, 0.0, 0.0],
-                                          [-17.19, 17.19, 0.0, 57.94, 0.0, 0.0],
-                                          [0.0, 0.0, 0.0, 0.0, 57.94, -17.19],
-                                          [0.0, 0.0, 0.0, 0.0, -17.19, 39.88]])
-
-    # act
-
-    trigonal_matrix.read_matrix_from_txt(trigonal_matrix_filename)
-
-    # assert
-
-    assert (trigonal_matrix.matrix == reference_trigonal_matrix).all()
-
 
 def test_convert_to_tensor_given_diagonal_eye_matrix_must_return_corresponding_tensor() -> None:
-    stiffness_matrix = StiffnessTensor()
+    stiffness_matrix = AnisotropicStiffnessTensor()
     stiffness_matrix.matrix = np.eye(6)
 
     tensor = _compute_4th_order_tensor_from_6x6_matrix(stiffness_matrix.matrix)
@@ -84,7 +50,7 @@ def test_convert_to_tensor_given_diagonal_eye_matrix_must_return_corresponding_t
 def test_voigt_averages_compare_with_reference_must_return_true(trigonal_matrix_filename: str) -> None:
     # arrange
 
-    trigonal_matrix = StiffnessTensor()
+    trigonal_matrix = AnisotropicStiffnessTensor()
     trigonal_matrix.read_matrix_from_txt(trigonal_matrix_filename)
 
     reference_voigt_average_bulk = 38.233
@@ -106,7 +72,7 @@ def test_voigt_averages_compare_with_reference_must_return_true(trigonal_matrix_
 def test_reuss_averages_compare_with_reference_must_return_true(trigonal_matrix_filename: str) -> None:
     # arrange
 
-    trigonal_matrix = StiffnessTensor()
+    trigonal_matrix = AnisotropicStiffnessTensor()
     trigonal_matrix.read_matrix_from_txt(trigonal_matrix_filename)
 
     reference_reuss_average_bulk = 37.724
@@ -128,7 +94,7 @@ def test_reuss_averages_compare_with_reference_must_return_true(trigonal_matrix_
 def test_hill_averages_compare_with_reference_must_return_true(trigonal_matrix_filename: str) -> None:
     # arrange
 
-    trigonal_matrix = StiffnessTensor()
+    trigonal_matrix = AnisotropicStiffnessTensor()
     trigonal_matrix.read_matrix_from_txt(trigonal_matrix_filename)
 
     reference_hill_average_bulk = 37.979

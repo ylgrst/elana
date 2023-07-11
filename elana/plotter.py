@@ -1,102 +1,28 @@
 import numpy as np
-from elana.stiffness_tensor import StiffnessTensor
+from elana.abstract_stiffness_tensor import AbstractStiffnessTensor
 import numpy.typing as npt
 import matplotlib.pyplot as plt
 from matplotlib import cm, colors
 
-
-def _symmetrical_colormap(cmap_settings, new_name=None):
-    ''' This function take a colormap and create a new one, as the concatenation of itself by a symmetrical fold.
-    '''
-    # get the colormap
-    cmap = plt.cm.get_cmap(*cmap_settings)
-    if not new_name:
-        new_name = "sym_" + cmap_settings[0]  # ex: 'sym_Blues'
-
-    # this defines the roughness of the colormap, 128 fine
-    n = 128
-
-    # get the list of color from colormap
-    colors_r = cmap(np.linspace(0, 1, n))  # take the standard colormap # 'right-part'
-    colors_l = colors_r[::-1]  # take the first list of color and flip the order # "left-part"
-
-    # combine them and build a new colormap
-    new_colors = np.vstack((colors_l, colors_r))
-    my_map = colors.LinearSegmentedColormap.from_list(new_name, new_colors)
-
-    return my_map
-
-
-_symmetrical_viridis = _symmetrical_colormap(('viridis', None))
-_symmetrical_blues = _symmetrical_colormap(('Blues', None))
-_symmetrical_greens = _symmetrical_colormap(('Greens', None))
-_symmetrical_reds = _symmetrical_colormap(('Reds', None))
-
-
-def make_planar_plot_data(data_x: npt.NDArray[np.float_], data_y: npt.NDArray[np.float_]) -> tuple[
-    npt.NDArray[np.float_], npt.NDArray[np.float_]]:
-    """Prepares 2d plot data for planar plotting"""
-    data_x = np.append(data_x, -data_x)
-    data_y = np.append(data_y, -data_y)
-    return data_x, data_y
-
-
-def plot_young_2d(stiffness_matrix: StiffnessTensor) -> None:
+def plot_young_2d(stiffness_matrix: AbstractStiffnessTensor) -> None:
     """2D plotter for Young modulus"""
 
-    n_points = 100
-
-    theta_array = np.linspace(0.0, np.pi, n_points)
-
-    young_xy = list(map(lambda x: stiffness_matrix.young((np.pi / 2.0, x)), theta_array))
-    young_xz = list(map(lambda x: stiffness_matrix.young((x, 0.0)), theta_array))
-    young_yz = list(map(lambda x: stiffness_matrix.young((x, np.pi / 2.0)), theta_array))
-
-    data_x_xy, data_y_xy = make_planar_plot_data(young_xy * np.cos(theta_array), young_xy * np.sin(theta_array))
-    data_x_xz, data_y_xz = make_planar_plot_data(young_xz * np.sin(theta_array), young_xz * np.cos(theta_array))
-    data_x_yz, data_y_yz = make_planar_plot_data(young_yz * np.sin(theta_array), young_yz * np.cos(theta_array))
-
     fig, (ax_xy, ax_xz, ax_yz) = plt.subplots(1, 3, figsize=(55, 15))
-    ax_xy.plot(data_x_xy, data_y_xy, 'g-')
+    ax_xy.plot(stiffness_matrix.data_young_x_xy, stiffness_matrix.data_young_y_xy, 'g-')
     ax_xy.grid()
     ax_xy.set_title("Young modulus on (xy) plane")
-    ax_xz.plot(data_x_xz, data_y_xz, 'g-')
+    ax_xz.plot(stiffness_matrix.data_young_x_xz, stiffness_matrix.data_young_y_xz, 'g-')
     ax_xz.grid()
     ax_xz.set_title("Young modulus on (xz) plane")
-    ax_yz.plot(data_x_yz, data_y_yz, 'g-')
+    ax_yz.plot(stiffness_matrix.data_young_x_yz, stiffness_matrix.data_young_y_yz, 'g-')
     ax_yz.set_title("Young modulus on (yz) plane")
 
     plt.savefig("planar_young.png")
     plt.show()
 
 
-def plot_young_3d(stiffness_matrix: StiffnessTensor) -> None:
+def plot_young_3d(stiffness_matrix: AbstractStiffnessTensor) -> None:
     """3D plotter for Young modulus"""
-
-    n_points = 200
-
-    theta_array = np.linspace(0.0, np.pi, n_points)
-    phi_array = np.linspace(0.0, 2 * np.pi, 2 * n_points)
-
-    data_x = np.zeros((n_points, 2 * n_points))
-    data_y = np.zeros((n_points, 2 * n_points))
-    data_z = np.zeros((n_points, 2 * n_points))
-    data_young = np.zeros((n_points, 2 * n_points))
-
-    for index_theta in range(len(theta_array)):
-        for index_phi in range(len(phi_array)):
-            young = stiffness_matrix.young((theta_array[index_theta], phi_array[index_phi]))
-            data_young[index_theta, index_phi] = young
-            z = young * np.cos(theta_array[index_theta])
-            x = young * np.sin(theta_array[index_theta]) * np.cos(phi_array[index_phi])
-            y = young * np.sin(theta_array[index_theta]) * np.sin(phi_array[index_phi])
-            data_x[index_theta, index_phi] = x
-            data_y[index_theta, index_phi] = y
-            data_z[index_theta, index_phi] = z
-
-    young_average = np.average(data_young)
-    young_min = np.min(data_young)
-    young_max = np.max(data_young)
 
     plt.figure()
     axes = plt.axes(projection='3d')
@@ -105,19 +31,19 @@ def plot_young_3d(stiffness_matrix: StiffnessTensor) -> None:
     axes.set_zlabel('z')
     axes.set_title(r'Directional stiffness $E$ (MPa)')
 
-    norm = colors.Normalize(vmin=young_min, vmax=young_max, clip=False)
+    norm = colors.Normalize(vmin=stiffness_matrix.young_3d_min, vmax=stiffness_matrix.young_3d_max, clip=False)
 
     scalarmap = cm.ScalarMappable(cmap='summer', norm=norm)
-    scalarmap.set_clim(young_min, young_max)
+    scalarmap.set_clim(stiffness_matrix.young_3d_min, stiffness_matrix.young_3d_max)
     scalarmap.set_array([])
-    fcolors = scalarmap.to_rgba(data_young)
+    fcolors = scalarmap.to_rgba(stiffness_matrix.data_young_3d)
 
 
     cbar = plt.colorbar(scalarmap, orientation="horizontal", fraction=0.05, pad=0.1,
-                        ticks=[young_min, young_average, young_max])
+                        ticks=[stiffness_matrix.young_3d_min, stiffness_matrix.young_3d_average, stiffness_matrix.young_3d_max])
     cbar.ax.tick_params(labelsize='large')
 
-    axes.plot_surface(data_x, data_y, data_z, facecolors=fcolors, norm=norm, cmap='summer', linewidth=0.1, edgecolor = 'k', alpha=0.8)
+    axes.plot_surface(stiffness_matrix.data_young_3d_x, stiffness_matrix.data_young_3d_y, stiffness_matrix.data_young_3d_z, facecolors=fcolors, norm=norm, cmap='summer', linewidth=0.1, edgecolor = 'k', alpha=0.8)
     axes.azim = 30
     axes.elev = 30
 
@@ -125,7 +51,7 @@ def plot_young_3d(stiffness_matrix: StiffnessTensor) -> None:
     plt.show()
 
 
-def plot_linear_compressibility_2d(stiffness_matrix: StiffnessTensor) -> None:
+def plot_linear_compressibility_2d(stiffness_matrix: AnisotropicStiffnessTensor) -> None:
     """2D plotter for linear compressibility modulus"""
 
     n_points = 100
@@ -178,7 +104,7 @@ def plot_linear_compressibility_2d(stiffness_matrix: StiffnessTensor) -> None:
     plt.show()
 
 
-def plot_linear_compressibility_3d(stiffness_matrix: StiffnessTensor) -> None:
+def plot_linear_compressibility_3d(stiffness_matrix: AnisotropicStiffnessTensor) -> None:
     """3D plotter for linear compressibility modulus"""
 
     n_points = 200
@@ -266,7 +192,7 @@ def plot_linear_compressibility_3d(stiffness_matrix: StiffnessTensor) -> None:
     plt.show()
 
 
-def plot_shear_modulus_2d(stiffness_matrix: StiffnessTensor) -> None:
+def plot_shear_modulus_2d(stiffness_matrix: AnisotropicStiffnessTensor) -> None:
     """2D plotter for shear modulus"""
 
     n_points = 100
@@ -316,7 +242,7 @@ def plot_shear_modulus_2d(stiffness_matrix: StiffnessTensor) -> None:
     plt.show()
 
 
-def plot_shear_modulus_3d(stiffness_matrix: StiffnessTensor) -> None:
+def plot_shear_modulus_3d(stiffness_matrix: AnisotropicStiffnessTensor) -> None:
     """3D plotter for shear modulus"""
 
     n_points = 100
@@ -408,7 +334,7 @@ def plot_shear_modulus_3d(stiffness_matrix: StiffnessTensor) -> None:
     plt.show()
 
 
-def plot_poisson_2d(stiffness_matrix: StiffnessTensor) -> None:
+def plot_poisson_2d(stiffness_matrix: AnisotropicStiffnessTensor) -> None:
     """2D plotter for Poisson coefficient"""
 
     n_points = 100
@@ -453,7 +379,7 @@ def plot_poisson_2d(stiffness_matrix: StiffnessTensor) -> None:
     plt.show()
 
 
-def plot_poisson_3d(stiffness_matrix: StiffnessTensor) -> None:
+def plot_poisson_3d(stiffness_matrix: AnisotropicStiffnessTensor) -> None:
     """3D plotter for Poisson coefficient"""
 
     n_points = 50
