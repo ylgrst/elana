@@ -3,18 +3,33 @@ from elana.abstract_stiffness_tensor import AbstractStiffnessTensor
 import numpy.typing as npt
 import matplotlib.pyplot as plt
 from matplotlib import cm, colors
+from elana.operations import make_planar_plot_data
 
 def plot_young_2d(stiffness_matrix: AbstractStiffnessTensor) -> None:
     """2D plotter for Young modulus"""
+    n_points = 100
+
+    theta_array = np.linspace(0.0, np.pi, n_points)
+
+    data_young_x_xy, data_young_y_xy = make_planar_plot_data(stiffness_matrix.data_young_2d["xy"] * np.cos(theta_array),
+                                                             stiffness_matrix.data_young_2d["xy"] * np.sin(theta_array))
+    data_young_x_xz, data_young_y_xz = make_planar_plot_data(stiffness_matrix.data_young_2d["xz"] * np.sin(theta_array),
+                                                             stiffness_matrix.data_young_2d["xz"] * np.cos(theta_array))
+    data_young_x_yz, data_young_y_yz = make_planar_plot_data(stiffness_matrix.data_young_2d["yz"] * np.sin(theta_array),
+                                                             stiffness_matrix.data_young_2d["yz"] * np.cos(theta_array))
 
     fig, (ax_xy, ax_xz, ax_yz) = plt.subplots(1, 3, figsize=(55, 15))
-    ax_xy.plot(stiffness_matrix.data_young_x_xy, stiffness_matrix.data_young_y_xy, 'g-')
+
+    ax_xy.plot(data_young_x_xy, data_young_y_xy, 'g-')
     ax_xy.grid()
     ax_xy.set_title("Young modulus on (xy) plane")
-    ax_xz.plot(stiffness_matrix.data_young_x_xz, stiffness_matrix.data_young_y_xz, 'g-')
+
+    ax_xz.plot(data_young_x_xz, data_young_y_xz, 'g-')
     ax_xz.grid()
     ax_xz.set_title("Young modulus on (xz) plane")
-    ax_yz.plot(stiffness_matrix.data_young_x_yz, stiffness_matrix.data_young_y_yz, 'g-')
+
+    ax_yz.plot(data_young_x_yz, data_young_y_yz, 'g-')
+    ax_yz.grid()
     ax_yz.set_title("Young modulus on (yz) plane")
 
     plt.savefig("planar_young.png")
@@ -24,6 +39,26 @@ def plot_young_2d(stiffness_matrix: AbstractStiffnessTensor) -> None:
 def plot_young_3d(stiffness_matrix: AbstractStiffnessTensor) -> None:
     """3D plotter for Young modulus"""
 
+    n_points = 200
+
+    theta_array = np.linspace(0.0, np.pi, n_points)
+    phi_array = np.linspace(0.0, 2 * np.pi, 2 * n_points)
+
+    data_xyz = np.zeros((3,n_points, 2*n_points))
+
+    for index_theta in range(len(theta_array)):
+        for index_phi in range(len(phi_array)):
+            z = stiffness_matrix.data_young_3d[index_theta, index_phi] * np.cos(theta_array[index_theta])
+            x = stiffness_matrix.data_young_3d[index_theta, index_phi] * np.sin(theta_array[index_theta]) * np.cos(phi_array[index_phi])
+            y = stiffness_matrix.data_young_3d[index_theta, index_phi] * np.sin(theta_array[index_theta]) * np.sin(phi_array[index_phi])
+            data_xyz[0,index_theta, index_phi] = x
+            data_xyz[1,index_theta, index_phi] = y
+            data_xyz[2,index_theta, index_phi] = z
+
+    young_3d_min = np.min(stiffness_matrix.data_young_3d)
+    young_3d_max = np.max(stiffness_matrix.data_young_3d)
+    young_3d_average = np.mean(stiffness_matrix.data_young_3d)
+
     plt.figure()
     axes = plt.axes(projection='3d')
     axes.set_xlabel('x')
@@ -31,19 +66,19 @@ def plot_young_3d(stiffness_matrix: AbstractStiffnessTensor) -> None:
     axes.set_zlabel('z')
     axes.set_title(r'Directional stiffness $E$ (MPa)')
 
-    norm = colors.Normalize(vmin=stiffness_matrix.young_3d_min, vmax=stiffness_matrix.young_3d_max, clip=False)
+    norm = colors.Normalize(vmin=young_3d_min, vmax=young_3d_max, clip=False)
 
     scalarmap = cm.ScalarMappable(cmap='summer', norm=norm)
-    scalarmap.set_clim(stiffness_matrix.young_3d_min, stiffness_matrix.young_3d_max)
+    scalarmap.set_clim(young_3d_min, young_3d_max)
     scalarmap.set_array([])
     fcolors = scalarmap.to_rgba(stiffness_matrix.data_young_3d)
 
 
     cbar = plt.colorbar(scalarmap, orientation="horizontal", fraction=0.05, pad=0.1,
-                        ticks=[stiffness_matrix.young_3d_min, stiffness_matrix.young_3d_average, stiffness_matrix.young_3d_max])
+                        ticks=[young_3d_min, young_3d_average, young_3d_max])
     cbar.ax.tick_params(labelsize='large')
 
-    axes.plot_surface(stiffness_matrix.data_young_3d_x, stiffness_matrix.data_young_3d_y, stiffness_matrix.data_young_3d_z, facecolors=fcolors, norm=norm, cmap='summer', linewidth=0.1, edgecolor = 'k', alpha=0.8)
+    axes.plot_surface(data_xyz[0,:,:], data_xyz[1,:,:], data_xyz[2,:,:], facecolors=fcolors, norm=norm, cmap='summer', linewidth=0.1, edgecolor = 'k', alpha=0.8)
     axes.azim = 30
     axes.elev = 30
 
@@ -51,7 +86,7 @@ def plot_young_3d(stiffness_matrix: AbstractStiffnessTensor) -> None:
     plt.show()
 
 
-def plot_linear_compressibility_2d(stiffness_matrix: AnisotropicStiffnessTensor) -> None:
+def plot_linear_compressibility_2d(stiffness_matrix: AbstractStiffnessTensor) -> None:
     """2D plotter for linear compressibility modulus"""
 
     n_points = 100
@@ -104,7 +139,7 @@ def plot_linear_compressibility_2d(stiffness_matrix: AnisotropicStiffnessTensor)
     plt.show()
 
 
-def plot_linear_compressibility_3d(stiffness_matrix: AnisotropicStiffnessTensor) -> None:
+def plot_linear_compressibility_3d(stiffness_matrix: AbstractStiffnessTensor) -> None:
     """3D plotter for linear compressibility modulus"""
 
     n_points = 200
@@ -192,7 +227,7 @@ def plot_linear_compressibility_3d(stiffness_matrix: AnisotropicStiffnessTensor)
     plt.show()
 
 
-def plot_shear_modulus_2d(stiffness_matrix: AnisotropicStiffnessTensor) -> None:
+def plot_shear_modulus_2d(stiffness_matrix: AbstractStiffnessTensor) -> None:
     """2D plotter for shear modulus"""
 
     n_points = 100
@@ -242,7 +277,7 @@ def plot_shear_modulus_2d(stiffness_matrix: AnisotropicStiffnessTensor) -> None:
     plt.show()
 
 
-def plot_shear_modulus_3d(stiffness_matrix: AnisotropicStiffnessTensor) -> None:
+def plot_shear_modulus_3d(stiffness_matrix: AbstractStiffnessTensor) -> None:
     """3D plotter for shear modulus"""
 
     n_points = 100
@@ -334,7 +369,7 @@ def plot_shear_modulus_3d(stiffness_matrix: AnisotropicStiffnessTensor) -> None:
     plt.show()
 
 
-def plot_poisson_2d(stiffness_matrix: AnisotropicStiffnessTensor) -> None:
+def plot_poisson_2d(stiffness_matrix: AbstractStiffnessTensor) -> None:
     """2D plotter for Poisson coefficient"""
 
     n_points = 100
@@ -379,7 +414,7 @@ def plot_poisson_2d(stiffness_matrix: AnisotropicStiffnessTensor) -> None:
     plt.show()
 
 
-def plot_poisson_3d(stiffness_matrix: AnisotropicStiffnessTensor) -> None:
+def plot_poisson_3d(stiffness_matrix: AbstractStiffnessTensor) -> None:
     """3D plotter for Poisson coefficient"""
 
     n_points = 50

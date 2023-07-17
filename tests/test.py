@@ -1,5 +1,6 @@
 import pytest
-from elana.anisotropic_stiffness_tensor import AnisotropicStiffnessTensor, _compute_4th_order_tensor_from_6x6_matrix
+from elana.anisotropic_stiffness_tensor import AnisotropicStiffnessTensor
+from elana.operations import _compute_4th_order_tensor_from_6x6_matrix
 
 import numpy as np
 

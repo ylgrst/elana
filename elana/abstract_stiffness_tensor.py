@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 import numpy.typing as npt
 import numpy as np
 from scipy import optimize
-from operations import _compute_4th_order_tensor_from_6x6_matrix, make_planar_plot_data
+from elana.operations import _compute_4th_order_tensor_from_6x6_matrix
 
 class AbstractStiffnessTensor(ABC):
     def __init__(self,
@@ -22,20 +22,9 @@ class AbstractStiffnessTensor(ABC):
 
         self.compliance_tensor = _compute_4th_order_tensor_from_6x6_matrix(self.compliance_matrix)
 
-        self.data_young_x_xy = None
-        self.data_young_y_xy = None
-        self.data_young_x_yz = None
-        self.data_young_y_yz = None
-        self.data_young_x_xz = None
-        self.data_young_y_xz = None
-        self.data_young_3d = None
-        self.data_young_3d_x = None
-        self.data_young_3d_y = None
-        self.data_young_3d_z = None
-        self.young_3d_average = None
-        self.young_3d_min = None
-        self.young_3d_max = None
-        self.young_anisotropy = None
+        self._build_young_2d_plot_data()
+        self._build_young_3d_plot_data()
+
 
     @abstractmethod
     def young(self, angles: tuple[float, float]) -> float:
@@ -154,16 +143,9 @@ class AbstractStiffnessTensor(ABC):
         young_xz = list(map(lambda x: self.young((x, 0.0)), theta_array))
         young_yz = list(map(lambda x: self.young((x, np.pi / 2.0)), theta_array))
 
-        data_young_x_xy, data_young_y_xy = make_planar_plot_data(young_xy * np.cos(theta_array), young_xy * np.sin(theta_array))
-        data_young_x_xz, data_young_y_xz = make_planar_plot_data(young_xz * np.sin(theta_array), young_xz * np.cos(theta_array))
-        data_young_x_yz, data_young_y_yz = make_planar_plot_data(young_yz * np.sin(theta_array), young_yz * np.cos(theta_array))
+        data_young_2d = {"xy": young_xy, "xz": young_xz, "yz": young_yz}
 
-        self.data_young_x_xy = data_young_x_xy
-        self.data_young_y_xy = data_young_y_xy
-        self.data_young_x_xz = data_young_x_xz
-        self.data_young_y_xz = data_young_y_xz
-        self.data_young_x_yz = data_young_x_yz
-        self.data_young_y_yz = data_young_y_yz
+        self.data_young_2d = data_young_2d
 
     def _build_young_3d_plot_data(self) -> None:
         n_points = 200
@@ -171,33 +153,14 @@ class AbstractStiffnessTensor(ABC):
         theta_array = np.linspace(0.0, np.pi, n_points)
         phi_array = np.linspace(0.0, 2 * np.pi, 2 * n_points)
 
-        data_x = np.zeros((n_points, 2 * n_points))
-        data_y = np.zeros((n_points, 2 * n_points))
-        data_z = np.zeros((n_points, 2 * n_points))
         data_young = np.zeros((n_points, 2 * n_points))
 
         for index_theta in range(len(theta_array)):
             for index_phi in range(len(phi_array)):
                 young = self.young((theta_array[index_theta], phi_array[index_phi]))
                 data_young[index_theta, index_phi] = young
-                z = young * np.cos(theta_array[index_theta])
-                x = young * np.sin(theta_array[index_theta]) * np.cos(phi_array[index_phi])
-                y = young * np.sin(theta_array[index_theta]) * np.sin(phi_array[index_phi])
-                data_x[index_theta, index_phi] = x
-                data_y[index_theta, index_phi] = y
-                data_z[index_theta, index_phi] = z
 
-        young_average = np.average(data_young)
-        young_min = np.min(data_young)
-        young_max = np.max(data_young)
 
         self.data_young_3d = data_young
-        self.data_young_3d_x = data_x
-        self.data_young_3d_y = data_y
-        self.data_young_3d_z = data_z
-        self.young_3d_average = young_average
-        self.young_3d_min = young_min
-        self.young_3d_max = young_max
-        self.young_anisotropy = young_max/young_min
 
 
