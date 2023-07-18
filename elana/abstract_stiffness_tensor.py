@@ -24,6 +24,8 @@ class AbstractStiffnessTensor(ABC):
 
         self._build_young_2d_plot_data()
         self._build_young_3d_plot_data()
+        self._build_linear_compressibility_2d_plot_data()
+        self._build_linear_compressibility_3d_plot_data()
 
 
     @abstractmethod
@@ -162,5 +164,55 @@ class AbstractStiffnessTensor(ABC):
 
 
         self.data_young_3d = data_young
+
+    def _build_linear_compressibility_2d_plot_data(self) -> None:
+        n_points = 100
+
+        theta_array = np.linspace(0.0, np.pi, n_points)
+
+        linear_compressibility_pos_xy = list(
+            map(lambda x: max(0.0, self.linear_compressibility((np.pi / 2.0, x))), theta_array))
+        linear_compressibility_pos_xz = list(
+            map(lambda x: max(0.0, self.linear_compressibility((x, 0.0))), theta_array))
+        linear_compressibility_pos_yz = list(
+            map(lambda x: max(0.0, self.linear_compressibility((x, np.pi / 2.0))), theta_array))
+
+        linear_compressibility_neg_xy = list(
+            map(lambda x: max(0.0, -self.linear_compressibility((np.pi / 2.0, x))), theta_array))
+        linear_compressibility_neg_xz = list(
+            map(lambda x: max(0.0, -self.linear_compressibility((x, 0.0))), theta_array))
+        linear_compressibility_neg_yz = list(
+            map(lambda x: max(0.0, -self.linear_compressibility((x, np.pi / 2.0))), theta_array))
+
+        data_linear_compressibility_2d_pos = {"xy": linear_compressibility_pos_xy, "xz": linear_compressibility_pos_xz, "yz": linear_compressibility_pos_yz}
+        data_linear_compressibility_2d_neg = {"xy": linear_compressibility_neg_xy, "xz": linear_compressibility_neg_xz, "yz": linear_compressibility_neg_yz}
+        data_linear_compressibility_2d = {"pos" : data_linear_compressibility_2d_pos, "neg": data_linear_compressibility_2d_neg}
+
+        self.data_linear_compressibility_2d = data_linear_compressibility_2d
+
+    def _build_linear_compressibility_3d_plot_data(self) -> None:
+        n_points = 200
+
+        theta_array = np.linspace(0.0, np.pi, n_points)
+        phi_array = np.linspace(0.0, 2 * np.pi, 2 * n_points)
+
+        data_linear_compressibility_pos = np.zeros((n_points, 2 * n_points))
+        data_linear_compressibility_neg = np.zeros((n_points, 2 * n_points))
+
+        for index_theta in range(len(theta_array)):
+            for index_phi in range(len(phi_array)):
+                linear_compressibility_pos = max(0.0, self.linear_compressibility(
+                    (theta_array[index_theta], phi_array[index_phi])))
+                linear_compressibility_neg = max(0.0, -self.linear_compressibility(
+                    (theta_array[index_theta], phi_array[index_phi])))
+
+                data_linear_compressibility_pos[index_theta, index_phi] = linear_compressibility_pos
+                data_linear_compressibility_neg[index_theta, index_phi] = linear_compressibility_neg
+
+        data_linear_compressibility_3d = {"pos": data_linear_compressibility_pos, "neg": data_linear_compressibility_neg}
+
+        self.data_linear_compressibility_3d = data_linear_compressibility_3d
+
+
 
 

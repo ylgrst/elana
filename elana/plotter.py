@@ -1,6 +1,5 @@
 import numpy as np
 from elana.abstract_stiffness_tensor import AbstractStiffnessTensor
-import numpy.typing as npt
 import matplotlib.pyplot as plt
 from matplotlib import cm, colors
 from elana.operations import make_planar_plot_data
@@ -93,33 +92,19 @@ def plot_linear_compressibility_2d(stiffness_matrix: AbstractStiffnessTensor) ->
 
     theta_array = np.linspace(0.0, np.pi, n_points)
 
-    linear_compressibility_pos_xy = list(
-        map(lambda x: max(0.0, stiffness_matrix.linear_compressibility((np.pi / 2.0, x))), theta_array))
-    linear_compressibility_pos_xz = list(
-        map(lambda x: max(0.0, stiffness_matrix.linear_compressibility((x, 0.0))), theta_array))
-    linear_compressibility_pos_yz = list(
-        map(lambda x: max(0.0, stiffness_matrix.linear_compressibility((x, np.pi / 2.0))), theta_array))
+    data_x_xy_pos, data_y_xy_pos = make_planar_plot_data(stiffness_matrix.data_linear_compressibility_2d["pos"]["xy"] * np.cos(theta_array),
+                                                         stiffness_matrix.data_linear_compressibility_2d["pos"]["xy"] * np.sin(theta_array))
+    data_x_xz_pos, data_y_xz_pos = make_planar_plot_data(stiffness_matrix.data_linear_compressibility_2d["pos"]["xz"] * np.sin(theta_array),
+                                                         stiffness_matrix.data_linear_compressibility_2d["pos"]["xz"] * np.cos(theta_array))
+    data_x_yz_pos, data_y_yz_pos = make_planar_plot_data(stiffness_matrix.data_linear_compressibility_2d["pos"]["yz"] * np.sin(theta_array),
+                                                         stiffness_matrix.data_linear_compressibility_2d["pos"]["yz"] * np.cos(theta_array))
 
-    data_x_xy_pos, data_y_xy_pos = make_planar_plot_data(linear_compressibility_pos_xy * np.cos(theta_array),
-                                                         linear_compressibility_pos_xy * np.sin(theta_array))
-    data_x_xz_pos, data_y_xz_pos = make_planar_plot_data(linear_compressibility_pos_xz * np.sin(theta_array),
-                                                         linear_compressibility_pos_xz * np.cos(theta_array))
-    data_x_yz_pos, data_y_yz_pos = make_planar_plot_data(linear_compressibility_pos_yz * np.sin(theta_array),
-                                                         linear_compressibility_pos_yz * np.cos(theta_array))
-
-    linear_compressibility_neg_xy = list(
-        map(lambda x: max(0.0, -stiffness_matrix.linear_compressibility((np.pi / 2.0, x))), theta_array))
-    linear_compressibility_neg_xz = list(
-        map(lambda x: max(0.0, -stiffness_matrix.linear_compressibility((x, 0.0))), theta_array))
-    linear_compressibility_neg_yz = list(
-        map(lambda x: max(0.0, -stiffness_matrix.linear_compressibility((x, np.pi / 2.0))), theta_array))
-
-    data_x_xy_neg, data_y_xy_neg = make_planar_plot_data(linear_compressibility_neg_xy * np.cos(theta_array),
-                                                         linear_compressibility_neg_xy * np.sin(theta_array))
-    data_x_xz_neg, data_y_xz_neg = make_planar_plot_data(linear_compressibility_neg_xz * np.sin(theta_array),
-                                                         linear_compressibility_neg_xz * np.cos(theta_array))
-    data_x_yz_neg, data_y_yz_neg = make_planar_plot_data(linear_compressibility_neg_yz * np.sin(theta_array),
-                                                         linear_compressibility_neg_yz * np.cos(theta_array))
+    data_x_xy_neg, data_y_xy_neg = make_planar_plot_data(stiffness_matrix.data_linear_compressibility_2d["neg"]["xy"] * np.cos(theta_array),
+                                                         stiffness_matrix.data_linear_compressibility_2d["neg"]["xy"] * np.sin(theta_array))
+    data_x_xz_neg, data_y_xz_neg = make_planar_plot_data(stiffness_matrix.data_linear_compressibility_2d["neg"]["xz"] * np.sin(theta_array),
+                                                         stiffness_matrix.data_linear_compressibility_2d["neg"]["xz"] * np.cos(theta_array))
+    data_x_yz_neg, data_y_yz_neg = make_planar_plot_data(stiffness_matrix.data_linear_compressibility_2d["neg"]["yz"] * np.sin(theta_array),
+                                                         stiffness_matrix.data_linear_compressibility_2d["neg"]["yz"] * np.cos(theta_array))
 
     fig, (ax_xy, ax_xz, ax_yz) = plt.subplots(1, 3, figsize=(55, 15))
     ax_xy.plot(data_x_xy_pos, data_y_xy_pos, 'g-')
@@ -147,47 +132,32 @@ def plot_linear_compressibility_3d(stiffness_matrix: AbstractStiffnessTensor) ->
     theta_array = np.linspace(0.0, np.pi, n_points)
     phi_array = np.linspace(0.0, 2 * np.pi, 2 * n_points)
 
-    data_x_pos = np.zeros((len(theta_array), len(phi_array)))
-    data_y_pos = np.zeros((len(theta_array), len(phi_array)))
-    data_z_pos = np.zeros((len(theta_array), len(phi_array)))
-
-    data_x_neg = np.zeros((len(theta_array), len(phi_array)))
-    data_y_neg = np.zeros((len(theta_array), len(phi_array)))
-    data_z_neg = np.zeros((len(theta_array), len(phi_array)))
-
-    data_linear_compressibility_pos = np.zeros((n_points, 2 * n_points))
-    data_linear_compressibility_neg = np.zeros((n_points, 2 * n_points))
+    data_xyz_pos = np.zeros((3, len(theta_array), len(phi_array)))
+    data_xyz_neg = np.zeros((3, len(theta_array), len(phi_array)))
 
     for index_theta in range(len(theta_array)):
         for index_phi in range(len(phi_array)):
-            linear_compressibility_pos = max(0.0, stiffness_matrix.linear_compressibility(
-                (theta_array[index_theta], phi_array[index_phi])))
-            linear_compressibility_neg = max(0.0, -stiffness_matrix.linear_compressibility(
-                (theta_array[index_theta], phi_array[index_phi])))
 
-            data_linear_compressibility_pos[index_theta, index_phi] = linear_compressibility_pos
-            data_linear_compressibility_neg[index_theta, index_phi] = linear_compressibility_neg
+            x_pos = stiffness_matrix.data_linear_compressibility_3d["pos"][index_theta, index_phi] * np.sin(theta_array[index_theta]) * np.cos(phi_array[index_phi])
+            y_pos = stiffness_matrix.data_linear_compressibility_3d["pos"][index_theta, index_phi] * np.sin(theta_array[index_theta]) * np.sin(phi_array[index_phi])
+            z_pos = stiffness_matrix.data_linear_compressibility_3d["pos"][index_theta, index_phi] * np.cos(theta_array[index_theta])
 
-            x_pos = linear_compressibility_pos * np.sin(theta_array[index_theta]) * np.cos(phi_array[index_phi])
-            y_pos = linear_compressibility_pos * np.sin(theta_array[index_theta]) * np.sin(phi_array[index_phi])
-            z_pos = linear_compressibility_pos * np.cos(theta_array[index_theta])
+            x_neg = stiffness_matrix.data_linear_compressibility_3d["neg"][index_theta, index_phi] * np.sin(theta_array[index_theta]) * np.cos(phi_array[index_phi])
+            y_neg = stiffness_matrix.data_linear_compressibility_3d["neg"][index_theta, index_phi] * np.sin(theta_array[index_theta]) * np.sin(phi_array[index_phi])
+            z_neg = stiffness_matrix.data_linear_compressibility_3d["neg"][index_theta, index_phi] * np.cos(theta_array[index_theta])
 
-            x_neg = linear_compressibility_neg * np.sin(theta_array[index_theta]) * np.cos(phi_array[index_phi])
-            y_neg = linear_compressibility_neg * np.sin(theta_array[index_theta]) * np.sin(phi_array[index_phi])
-            z_neg = linear_compressibility_neg * np.cos(theta_array[index_theta])
+            data_xyz_pos[0, index_theta, index_phi] = x_pos
+            data_xyz_pos[1, index_theta, index_phi] = y_pos
+            data_xyz_pos[2, index_theta, index_phi] = z_pos
 
-            data_x_pos[index_theta][index_phi] = x_pos
-            data_y_pos[index_theta][index_phi] = y_pos
-            data_z_pos[index_theta][index_phi] = z_pos
+            data_xyz_neg[0, index_theta, index_phi] = x_neg
+            data_xyz_neg[1, index_theta, index_phi] = y_neg
+            data_xyz_neg[2, index_theta, index_phi] = z_neg
 
-            data_x_neg[index_theta][index_phi] = x_neg
-            data_y_neg[index_theta][index_phi] = y_neg
-            data_z_neg[index_theta][index_phi] = z_neg
-
-    linear_compressibility_pos_max = np.max(data_linear_compressibility_pos)
-    linear_compressibility_pos_min = np.min(data_linear_compressibility_pos)
-    linear_compressibility_neg_max = np.max(data_linear_compressibility_neg)
-    linear_compressibility_neg_min = np.min(data_linear_compressibility_neg)
+    linear_compressibility_pos_max = np.max(stiffness_matrix.data_linear_compressibility_3d["pos"])
+    linear_compressibility_pos_min = np.min(stiffness_matrix.data_linear_compressibility_3d["pos"])
+    linear_compressibility_neg_max = np.max(stiffness_matrix.data_linear_compressibility_3d["neg"])
+    linear_compressibility_neg_min = np.min(stiffness_matrix.data_linear_compressibility_3d["neg"])
 
     plt.figure(figsize=(10,10))
     axes = plt.axes(projection='3d')
@@ -202,7 +172,7 @@ def plot_linear_compressibility_3d(stiffness_matrix: AbstractStiffnessTensor) ->
     scalarmap_pos = cm.ScalarMappable(cmap='Greens', norm=norm_pos)
     scalarmap_pos.set_clim(linear_compressibility_pos_min, linear_compressibility_pos_max)
     scalarmap_pos.set_array([])
-    fcolors_pos = scalarmap_pos.to_rgba(data_linear_compressibility_pos)
+    fcolors_pos = scalarmap_pos.to_rgba(stiffness_matrix.data_linear_compressibility_3d["pos"])
 
     cbar_pos = plt.colorbar(scalarmap_pos, orientation="horizontal", pad=0.05, shrink=0.6,
                         ticks=[linear_compressibility_pos_min, linear_compressibility_pos_max])
@@ -211,14 +181,14 @@ def plot_linear_compressibility_3d(stiffness_matrix: AbstractStiffnessTensor) ->
     scalarmap_neg = cm.ScalarMappable(cmap='Reds', norm=norm_neg)
     scalarmap_neg.set_clim(linear_compressibility_neg_min, linear_compressibility_neg_max)
     scalarmap_neg.set_array([])
-    fcolors_neg = scalarmap_neg.to_rgba(data_linear_compressibility_neg)
+    fcolors_neg = scalarmap_neg.to_rgba(stiffness_matrix.data_linear_compressibility_3d["neg"])
 
     cbar_neg = plt.colorbar(scalarmap_neg, orientation="horizontal", pad=0.08, shrink=0.6,
                         ticks=[linear_compressibility_neg_min, linear_compressibility_neg_max])
     cbar_neg.ax.tick_params(labelsize='large')
 
-    axes.plot_surface(data_x_pos, data_y_pos, data_z_pos, facecolors=fcolors_pos, norm=norm_pos, cmap='Greens', linewidth=0.1, edgecolor = 'k', alpha=0.8)
-    axes.plot_surface(data_x_neg, data_y_neg, data_z_neg, facecolors=fcolors_neg, norm=norm_neg, cmap='Reds', linewidth=0.1, edgecolor = 'k', alpha=0.8)
+    axes.plot_surface(data_xyz_pos[0,:,:], data_xyz_pos[1,:,:], data_xyz_pos[2,:,:], facecolors=fcolors_pos, norm=norm_pos, cmap='Greens', linewidth=0.1, edgecolor = 'k', alpha=0.8)
+    axes.plot_surface(data_xyz_neg[0,:,:], data_xyz_neg[1,:,:], data_xyz_neg[2,:,:], facecolors=fcolors_neg, norm=norm_neg, cmap='Reds', linewidth=0.1, edgecolor = 'k', alpha=0.8)
 
     axes.azim = 30
     axes.elev = 30
