@@ -204,30 +204,26 @@ def plot_shear_modulus_2d(stiffness_matrix: AbstractStiffnessTensor) -> None:
 
     theta_array = np.linspace(0.0, np.pi, n_points)
 
-    shear_xy = list(map(lambda x: stiffness_matrix.shear_2d((np.pi / 2.0, x)), theta_array))
-    shear_xz = list(map(lambda x: stiffness_matrix.shear_2d((x, 0.0)), theta_array))
-    shear_yz = list(map(lambda x: stiffness_matrix.shear_2d((x, np.pi / 2.0)), theta_array))
-
     data_x_xy_min, data_y_xy_min = make_planar_plot_data(
-        np.array([shear[0] * np.cos(theta) for shear, theta in zip(shear_xy, theta_array)]),
-        np.array([shear[0] * np.sin(theta) for shear, theta in zip(shear_xy, theta_array)]))
+        np.array([shear[0] * np.cos(theta) for shear, theta in zip(stiffness_matrix.data_shear_2d["xy"], theta_array)]),
+        np.array([shear[0] * np.sin(theta) for shear, theta in zip(stiffness_matrix.data_shear_2d["xy"], theta_array)]))
     data_x_xy_max, data_y_xy_max = make_planar_plot_data(
-        np.array([shear[1] * np.cos(theta) for shear, theta in zip(shear_xy, theta_array)]),
-        np.array([shear[1] * np.sin(theta) for shear, theta in zip(shear_xy, theta_array)]))
+        np.array([shear[1] * np.cos(theta) for shear, theta in zip(stiffness_matrix.data_shear_2d["xy"], theta_array)]),
+        np.array([shear[1] * np.sin(theta) for shear, theta in zip(stiffness_matrix.data_shear_2d["xy"], theta_array)]))
 
     data_x_xz_min, data_y_xz_min = make_planar_plot_data(
-        np.array([shear[0] * np.sin(theta) for shear, theta in zip(shear_xz, theta_array)]),
-        np.array([shear[0] * np.cos(theta) for shear, theta in zip(shear_xz, theta_array)]))
+        np.array([shear[0] * np.sin(theta) for shear, theta in zip(stiffness_matrix.data_shear_2d["xz"], theta_array)]),
+        np.array([shear[0] * np.cos(theta) for shear, theta in zip(stiffness_matrix.data_shear_2d["xz"], theta_array)]))
     data_x_xz_max, data_y_xz_max = make_planar_plot_data(
-        np.array([shear[1] * np.sin(theta) for shear, theta in zip(shear_xz, theta_array)]),
-        np.array([shear[1] * np.cos(theta) for shear, theta in zip(shear_xz, theta_array)]))
+        np.array([shear[1] * np.sin(theta) for shear, theta in zip(stiffness_matrix.data_shear_2d["xz"], theta_array)]),
+        np.array([shear[1] * np.cos(theta) for shear, theta in zip(stiffness_matrix.data_shear_2d["xz"], theta_array)]))
 
     data_x_yz_min, data_y_yz_min = make_planar_plot_data(
-        np.array([shear[0] * np.sin(theta) for shear, theta in zip(shear_yz, theta_array)]),
-        np.array([shear[0] * np.cos(theta) for shear, theta in zip(shear_yz, theta_array)]))
+        np.array([shear[0] * np.sin(theta) for shear, theta in zip(stiffness_matrix.data_shear_2d["yz"], theta_array)]),
+        np.array([shear[0] * np.cos(theta) for shear, theta in zip(stiffness_matrix.data_shear_2d["yz"], theta_array)]))
     data_x_yz_max, data_y_yz_max = make_planar_plot_data(
-        np.array([shear[1] * np.sin(theta) for shear, theta in zip(shear_yz, theta_array)]),
-        np.array([shear[1] * np.cos(theta) for shear, theta in zip(shear_yz, theta_array)]))
+        np.array([shear[1] * np.sin(theta) for shear, theta in zip(stiffness_matrix.data_shear_2d["yz"], theta_array)]),
+        np.array([shear[1] * np.cos(theta) for shear, theta in zip(stiffness_matrix.data_shear_2d["yz"], theta_array)]))
 
     fig, (ax_xy, ax_xz, ax_yz) = plt.subplots(1, 3, figsize=(55, 15))
     ax_xy.plot(data_x_xy_max, data_y_xy_max, 'b-')
@@ -257,48 +253,29 @@ def plot_shear_modulus_3d(stiffness_matrix: AbstractStiffnessTensor) -> None:
     phi_plus_pi_array = [phi_array[i] + np.pi for i in range(1, len(phi_array))]
     phi_array = np.append(phi_array, phi_plus_pi_array)
 
-    data_x_shear_min = np.zeros((len(theta_array), len(phi_array)))
-    data_y_shear_min = np.zeros((len(theta_array), len(phi_array)))
-    data_z_shear_min = np.zeros((len(theta_array), len(phi_array)))
-    data_x_shear_max = np.zeros((len(theta_array), len(phi_array)))
-    data_y_shear_max = np.zeros((len(theta_array), len(phi_array)))
-    data_z_shear_max = np.zeros((len(theta_array), len(phi_array)))
-
-    data_shear_max = np.zeros((n_points, 2 * n_points))
-    data_shear_min = np.zeros((n_points, 2 * n_points))
+    data_xyz_shear_min = np.zeros((3, len(theta_array), len(phi_array)))
+    data_xyz_shear_max = np.zeros((3, len(theta_array), len(phi_array)))
 
     for index_theta in range(len(theta_array)):
         for index_phi in range(len(phi_array)):
-            shear = stiffness_matrix.shear_3d((theta_array[index_theta], phi_array[index_phi]))
-            data_shear_min[index_theta, index_phi] = shear[0]
-            data_shear_max[index_theta, index_phi] = shear[1]
-            z = np.cos(theta_array[index_theta])
-            x = np.sin(theta_array[index_theta]) * np.cos(phi_array[index_phi])
-            y = np.sin(theta_array[index_theta]) * np.sin(phi_array[index_phi])
 
-            shear_min = shear[0]
-            z_min = shear_min * z
-            x_min = shear_min * x
-            y_min = shear_min * y
-            data_x_shear_min[index_theta, index_phi] = x_min
-            data_y_shear_min[index_theta, index_phi] = y_min
-            data_z_shear_min[index_theta, index_phi] = z_min
+            shear_min = stiffness_matrix.data_shear_3d["min"][index_theta, index_phi]
+            data_xyz_shear_min[0, index_theta, index_phi] = shear_min * np.sin(theta_array[index_theta]) * np.cos(phi_array[index_phi])
+            data_xyz_shear_min[1, index_theta, index_phi] = shear_min * np.sin(theta_array[index_theta]) * np.sin(phi_array[index_phi])
+            data_xyz_shear_min[2, index_theta, index_phi] = shear_min * np.cos(theta_array[index_theta])
 
-            shear_max = shear[1]
-            z_max = shear_max * z
-            x_max = shear_max * x
-            y_max = shear_max * y
-            data_x_shear_max[index_theta, index_phi] = x_max
-            data_y_shear_max[index_theta, index_phi] = y_max
-            data_z_shear_max[index_theta, index_phi] = z_max
+            shear_max = stiffness_matrix.data_shear_3d["max"][index_theta, index_phi]
+            data_xyz_shear_max[0, index_theta, index_phi] = shear_max * np.sin(theta_array[index_theta]) * np.cos(phi_array[index_phi])
+            data_xyz_shear_max[1, index_theta, index_phi] = shear_max * np.sin(theta_array[index_theta]) * np.sin(phi_array[index_phi])
+            data_xyz_shear_max[2, index_theta, index_phi] = shear_max * np.cos(theta_array[index_theta])
 
-    shear_min_average = np.average(data_shear_min)
-    shear_min_min = np.min(data_shear_min)
-    shear_min_max = np.max(data_shear_min)
+    shear_min_average = np.average(stiffness_matrix.data_shear_3d["min"])
+    shear_min_min = np.min(stiffness_matrix.data_shear_3d["min"])
+    shear_min_max = np.max(stiffness_matrix.data_shear_3d["min"])
 
-    shear_max_average = np.average(data_shear_max)
-    shear_max_min = np.min(data_shear_max)
-    shear_max_max = np.max(data_shear_max)
+    shear_max_average = np.average(stiffness_matrix.data_shear_3d["max"])
+    shear_max_min = np.min(stiffness_matrix.data_shear_3d["max"])
+    shear_max_max = np.max(stiffness_matrix.data_shear_3d["max"])
 
     plt.figure(figsize=(10,10))
     axes = plt.axes(projection='3d')
@@ -313,15 +290,15 @@ def plot_shear_modulus_3d(stiffness_matrix: AbstractStiffnessTensor) -> None:
     scalarmap_shear_min = cm.ScalarMappable(cmap="Greens", norm=norm_min)
     scalarmap_shear_min.set_clim(shear_min_min, shear_min_max)
     scalarmap_shear_min.set_array([])
-    fcolors_shear_min = scalarmap_shear_min.to_rgba(data_shear_min)
+    fcolors_shear_min = scalarmap_shear_min.to_rgba(stiffness_matrix.data_shear_3d["min"])
 
     scalarmap_shear_max = cm.ScalarMappable(cmap="Blues", norm=norm_max)
     scalarmap_shear_max.set_clim(shear_max_min, shear_max_max)
     scalarmap_shear_max.set_array([])
-    fcolors_shear_max = scalarmap_shear_max.to_rgba(data_shear_max)
+    fcolors_shear_max = scalarmap_shear_max.to_rgba(stiffness_matrix.data_shear_3d["max"])
 
-    axes.plot_surface(data_x_shear_min, data_y_shear_min, data_z_shear_min, facecolors=fcolors_shear_min, norm=norm_min, cmap="Greens", linewidth=0.05, edgecolor = 'k', alpha=0.8)
-    axes.plot_surface(data_x_shear_max, data_y_shear_max, data_z_shear_max, facecolors=fcolors_shear_max, norm=norm_max, cmap="Blues", linewidth=0.05, edgecolor = 'k',
+    axes.plot_surface(data_xyz_shear_min[0,:,:], data_xyz_shear_min[1,:,:], data_xyz_shear_min[2,:,:], facecolors=fcolors_shear_min, norm=norm_min, cmap="Greens", linewidth=0.05, edgecolor = 'k', alpha=0.8)
+    axes.plot_surface(data_xyz_shear_max[0,:,:], data_xyz_shear_max[1,:,:], data_xyz_shear_max[2,:,:], facecolors=fcolors_shear_max, norm=norm_max, cmap="Blues", linewidth=0.05, edgecolor = 'k',
                       alpha=0.5)
 
     cbar_min = plt.colorbar(scalarmap_shear_min, orientation="horizontal", pad=0.05, shrink=0.6,

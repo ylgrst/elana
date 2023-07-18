@@ -26,6 +26,8 @@ class AbstractStiffnessTensor(ABC):
         self._build_young_3d_plot_data()
         self._build_linear_compressibility_2d_plot_data()
         self._build_linear_compressibility_3d_plot_data()
+        self._build_shear_2d_plot_data()
+        self._build_shear_3d_plot_data()
 
 
     @abstractmethod
@@ -213,6 +215,37 @@ class AbstractStiffnessTensor(ABC):
 
         self.data_linear_compressibility_3d = data_linear_compressibility_3d
 
+    def _build_shear_2d_plot_data(self) -> None:
+        n_points = 100
 
+        theta_array = np.linspace(0.0, np.pi, n_points)
 
+        shear_xy = list(map(lambda x: self.shear_2d((np.pi / 2.0, x)), theta_array))
+        shear_xz = list(map(lambda x: self.shear_2d((x, 0.0)), theta_array))
+        shear_yz = list(map(lambda x: self.shear_2d((x, np.pi / 2.0)), theta_array))
 
+        data_shear_2d = {"xy": shear_xy, "xz": shear_xz, "yz": shear_yz}
+
+        self.data_shear_2d = data_shear_2d
+
+    def _build_shear_3d_plot_data(self) -> None:
+        n_points = 100
+
+        theta_array = np.linspace(0.0, np.pi, n_points)
+        phi_array = np.linspace(0.0, np.pi, n_points)
+        phi_plus_pi_array = [phi_array[i] + np.pi for i in range(1, len(phi_array))]
+        phi_array = np.append(phi_array, phi_plus_pi_array)
+
+        data_shear_max = np.zeros((n_points, 2 * n_points))
+        data_shear_min = np.zeros((n_points, 2 * n_points))
+
+        for index_theta in range(len(theta_array)):
+            for index_phi in range(len(phi_array)):
+                shear = self.shear_3d((theta_array[index_theta], phi_array[index_phi]))
+                data_shear_min[index_theta, index_phi] = shear[0]
+                data_shear_max[index_theta, index_phi] = shear[1]
+
+        data_shear_3d = {"max": data_shear_max, "min": data_shear_min}
+        self.data_shear_3d = data_shear_3d
+
+    
