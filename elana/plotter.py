@@ -323,21 +323,17 @@ def plot_poisson_2d(stiffness_matrix: AbstractStiffnessTensor) -> None:
 
     theta_array = np.linspace(0.0, np.pi, n_points)
 
-    poisson_xy = list(map(lambda x: stiffness_matrix.poisson_2d((np.pi / 2.0, x)), theta_array))
-    poisson_xz = list(map(lambda x: stiffness_matrix.poisson_2d((x, 0.0)), theta_array))
-    poisson_yz = list(map(lambda x: stiffness_matrix.poisson_2d((x, np.pi / 2.0)), theta_array))
+    data_x_xy_1, data_y_xy_1 = make_planar_plot_data(np.array([poisson[0] * np.cos(theta) for poisson, theta in zip(stiffness_matrix.data_poisson_2d["xy"], theta_array)]), np.array([poisson[0] * np.sin(theta) for poisson, theta in zip(stiffness_matrix.data_poisson_2d["xy"], theta_array)]))
+    data_x_xy_2, data_y_xy_2 = make_planar_plot_data(np.array([poisson[1] * np.cos(theta) for poisson, theta in zip(stiffness_matrix.data_poisson_2d["xy"], theta_array)]), np.array([poisson[1] * np.sin(theta) for poisson, theta in zip(stiffness_matrix.data_poisson_2d["xy"], theta_array)]))
+    data_x_xy_3, data_y_xy_3 = make_planar_plot_data(np.array([poisson[2] * np.cos(theta) for poisson, theta in zip(stiffness_matrix.data_poisson_2d["xy"], theta_array)]), np.array([poisson[2] * np.sin(theta) for poisson, theta in zip(stiffness_matrix.data_poisson_2d["xy"], theta_array)]))
 
-    data_x_xy_1, data_y_xy_1 = make_planar_plot_data(np.array([poisson[0] * np.cos(theta) for poisson, theta in zip(poisson_xy, theta_array)]), np.array([poisson[0] * np.sin(theta) for poisson, theta in zip(poisson_xy, theta_array)]))
-    data_x_xy_2, data_y_xy_2 = make_planar_plot_data(np.array([poisson[1] * np.cos(theta) for poisson, theta in zip(poisson_xy, theta_array)]), np.array([poisson[1] * np.sin(theta) for poisson, theta in zip(poisson_xy, theta_array)]))
-    data_x_xy_3, data_y_xy_3 = make_planar_plot_data(np.array([poisson[2] * np.cos(theta) for poisson, theta in zip(poisson_xy, theta_array)]), np.array([poisson[2] * np.sin(theta) for poisson, theta in zip(poisson_xy, theta_array)]))
+    data_x_xz_1, data_y_xz_1 = make_planar_plot_data(np.array([poisson[0] * np.sin(theta) for poisson, theta in zip(stiffness_matrix.data_poisson_2d["xz"], theta_array)]), np.array([poisson[0] * np.cos(theta) for poisson, theta in zip(stiffness_matrix.data_poisson_2d["xz"], theta_array)]))
+    data_x_xz_2, data_y_xz_2 = make_planar_plot_data(np.array([poisson[1] * np.sin(theta) for poisson, theta in zip(stiffness_matrix.data_poisson_2d["xz"], theta_array)]), np.array([poisson[1] * np.cos(theta) for poisson, theta in zip(stiffness_matrix.data_poisson_2d["xz"], theta_array)]))
+    data_x_xz_3, data_y_xz_3 = make_planar_plot_data(np.array([poisson[2] * np.sin(theta) for poisson, theta in zip(stiffness_matrix.data_poisson_2d["xz"], theta_array)]), np.array([poisson[2] * np.cos(theta) for poisson, theta in zip(stiffness_matrix.data_poisson_2d["xz"], theta_array)]))
 
-    data_x_xz_1, data_y_xz_1 = make_planar_plot_data(np.array([poisson[0] * np.sin(theta) for poisson, theta in zip(poisson_xz, theta_array)]), np.array([poisson[0] * np.cos(theta) for poisson, theta in zip(poisson_xz, theta_array)]))
-    data_x_xz_2, data_y_xz_2 = make_planar_plot_data(np.array([poisson[1] * np.sin(theta) for poisson, theta in zip(poisson_xz, theta_array)]), np.array([poisson[1] * np.cos(theta) for poisson, theta in zip(poisson_xz, theta_array)]))
-    data_x_xz_3, data_y_xz_3 = make_planar_plot_data(np.array([poisson[2] * np.sin(theta) for poisson, theta in zip(poisson_xz, theta_array)]), np.array([poisson[2] * np.cos(theta) for poisson, theta in zip(poisson_xz, theta_array)]))
-
-    data_x_yz_1, data_y_yz_1 = make_planar_plot_data(np.array([poisson[0] * np.sin(theta) for poisson, theta in zip(poisson_yz, theta_array)]), np.array([poisson[0] * np.cos(theta) for poisson, theta in zip(poisson_yz, theta_array)]))
-    data_x_yz_2, data_y_yz_2 = make_planar_plot_data(np.array([poisson[1] * np.sin(theta) for poisson, theta in zip(poisson_yz, theta_array)]), np.array([poisson[1] * np.cos(theta) for poisson, theta in zip(poisson_yz, theta_array)]))
-    data_x_yz_3, data_y_yz_3 = make_planar_plot_data(np.array([poisson[2] * np.sin(theta) for poisson, theta in zip(poisson_yz, theta_array)]), np.array([poisson[2] * np.cos(theta) for poisson, theta in zip(poisson_yz, theta_array)]))
+    data_x_yz_1, data_y_yz_1 = make_planar_plot_data(np.array([poisson[0] * np.sin(theta) for poisson, theta in zip(stiffness_matrix.data_poisson_2d["yz"], theta_array)]), np.array([poisson[0] * np.cos(theta) for poisson, theta in zip(stiffness_matrix.data_poisson_2d["yz"], theta_array)]))
+    data_x_yz_2, data_y_yz_2 = make_planar_plot_data(np.array([poisson[1] * np.sin(theta) for poisson, theta in zip(stiffness_matrix.data_poisson_2d["yz"], theta_array)]), np.array([poisson[1] * np.cos(theta) for poisson, theta in zip(stiffness_matrix.data_poisson_2d["yz"], theta_array)]))
+    data_x_yz_3, data_y_yz_3 = make_planar_plot_data(np.array([poisson[2] * np.sin(theta) for poisson, theta in zip(stiffness_matrix.data_poisson_2d["yz"], theta_array)]), np.array([poisson[2] * np.cos(theta) for poisson, theta in zip(stiffness_matrix.data_poisson_2d["yz"], theta_array)]))
 
     fig, (ax_xy, ax_xz, ax_yz) = plt.subplots(1, 3, figsize=(55, 15))
     ax_xy.plot(data_x_xy_1, data_y_xy_1, 'r-')
@@ -371,56 +367,42 @@ def plot_poisson_3d(stiffness_matrix: AbstractStiffnessTensor) -> None:
     phi_plus_pi_array = [phi_array[i] + np.pi for i in range(1, len(phi_array))]
     phi_array = np.append(phi_array, phi_plus_pi_array)
 
-    data_x_poisson_1 = np.zeros((len(theta_array), len(phi_array)))
-    data_y_poisson_1 = np.zeros((len(theta_array), len(phi_array)))
-    data_z_poisson_1 = np.zeros((len(theta_array), len(phi_array)))
-    data_x_poisson_2 = np.zeros((len(theta_array), len(phi_array)))
-    data_y_poisson_2 = np.zeros((len(theta_array), len(phi_array)))
-    data_z_poisson_2 = np.zeros((len(theta_array), len(phi_array)))
-    data_x_poisson_3 = np.zeros((len(theta_array), len(phi_array)))
-    data_y_poisson_3 = np.zeros((len(theta_array), len(phi_array)))
-    data_z_poisson_3 = np.zeros((len(theta_array), len(phi_array)))
-
-    data_poisson_1 = np.zeros((n_points, 2 * n_points))
-    data_poisson_2 = np.zeros((n_points, 2 * n_points))
-    data_poisson_3 = np.zeros((n_points, 2 * n_points))
+    data_xyz_poisson_1 = np.zeros((3, len(theta_array), len(phi_array)))
+    data_xyz_poisson_2 = np.zeros((3, len(theta_array), len(phi_array)))
+    data_xyz_poisson_3 = np.zeros((3, len(theta_array), len(phi_array)))
 
     for index_theta in range(len(theta_array)):
         for index_phi in range(len(phi_array)):
-            poisson = stiffness_matrix.poisson_3d((theta_array[index_theta], phi_array[index_phi]))
             z = np.cos(theta_array[index_theta])
             x = np.sin(theta_array[index_theta]) * np.cos(phi_array[index_phi])
             y = np.sin(theta_array[index_theta]) * np.sin(phi_array[index_phi])
 
-            poisson_1 = poisson[0]
-            data_poisson_1[index_theta, index_phi] = poisson_1
-            data_x_poisson_1[index_theta, index_phi] = poisson_1 * x
-            data_y_poisson_1[index_theta, index_phi] = poisson_1 * y
-            data_z_poisson_1[index_theta, index_phi] = poisson_1 * z
+            poisson_1 = stiffness_matrix.data_poisson_3d[0, index_theta, index_phi]
+            data_xyz_poisson_1[0, index_theta, index_phi] = poisson_1 * x
+            data_xyz_poisson_1[1, index_theta, index_phi] = poisson_1 * y
+            data_xyz_poisson_1[2, index_theta, index_phi] = poisson_1 * z
 
-            poisson_2 = poisson[1]
-            data_poisson_2[index_theta, index_phi] = poisson_2
-            data_x_poisson_2[index_theta, index_phi] = poisson_2 * x
-            data_y_poisson_2[index_theta, index_phi] = poisson_2 * y
-            data_z_poisson_2[index_theta, index_phi] = poisson_2 * z
+            poisson_2 = stiffness_matrix.data_poisson_3d[1, index_theta, index_phi]
+            data_xyz_poisson_2[0, index_theta, index_phi] = poisson_2 * x
+            data_xyz_poisson_2[1, index_theta, index_phi] = poisson_2 * y
+            data_xyz_poisson_2[2, index_theta, index_phi] = poisson_2 * z
 
-            poisson_3 = poisson[2]
-            data_poisson_3[index_theta, index_phi] = poisson_3
-            data_x_poisson_3[index_theta, index_phi] = poisson_3 * x
-            data_y_poisson_3[index_theta, index_phi] = poisson_3 * y
-            data_z_poisson_3[index_theta, index_phi] = poisson_3 * z
+            poisson_3 = stiffness_matrix.data_poisson_3d[2, index_theta, index_phi]
+            data_xyz_poisson_3[0, index_theta, index_phi] = poisson_3 * x
+            data_xyz_poisson_3[1, index_theta, index_phi] = poisson_3 * y
+            data_xyz_poisson_3[2, index_theta, index_phi] = poisson_3 * z
 
-    poisson_1_average = np.average(data_poisson_1)
-    poisson_1_min = np.min(data_poisson_1)
-    poisson_1_max = np.max(data_poisson_1)
+    poisson_1_average = np.average(stiffness_matrix.data_poisson_3d[0, :, :])
+    poisson_1_min = np.min(stiffness_matrix.data_poisson_3d[0, :, :])
+    poisson_1_max = np.max(stiffness_matrix.data_poisson_3d[0, :, :])
 
-    poisson_2_average = np.average(data_poisson_2)
-    poisson_2_min = np.min(data_poisson_2)
-    poisson_2_max = np.max(data_poisson_2)
+    poisson_2_average = np.average(stiffness_matrix.data_poisson_3d[1, :, :])
+    poisson_2_min = np.min(stiffness_matrix.data_poisson_3d[1, :, :])
+    poisson_2_max = np.max(stiffness_matrix.data_poisson_3d[1, :, :])
 
-    poisson_3_average = np.average(data_poisson_3)
-    poisson_3_min = np.min(data_poisson_3)
-    poisson_3_max = np.max(data_poisson_3)
+    poisson_3_average = np.average(stiffness_matrix.data_poisson_3d[2, :, :])
+    poisson_3_min = np.min(stiffness_matrix.data_poisson_3d[2, :, :])
+    poisson_3_max = np.max(stiffness_matrix.data_poisson_3d[2, :, :])
 
     plt.figure(figsize=(12,12))
     axes = plt.axes(projection='3d')
@@ -436,24 +418,24 @@ def plot_poisson_3d(stiffness_matrix: AbstractStiffnessTensor) -> None:
     scalarmap_poisson_1 = cm.ScalarMappable(cmap="Reds", norm=norm_poisson_1)
     scalarmap_poisson_1.set_clim(poisson_1_min, poisson_1_max)
     scalarmap_poisson_1.set_array([])
-    fcolors_poisson_1 = scalarmap_poisson_1.to_rgba(data_poisson_1)
+    fcolors_poisson_1 = scalarmap_poisson_1.to_rgba(stiffness_matrix.data_poisson_3d[0, :, :])
 
     scalarmap_poisson_2 = cm.ScalarMappable(cmap="Greens", norm=norm_poisson_2)
     scalarmap_poisson_2.set_clim(poisson_2_min, poisson_2_max)
     scalarmap_poisson_2.set_array([])
-    fcolors_poisson_2 = scalarmap_poisson_2.to_rgba(data_poisson_2)
+    fcolors_poisson_2 = scalarmap_poisson_2.to_rgba(stiffness_matrix.data_poisson_3d[1, :, :])
 
     scalarmap_poisson_3 = cm.ScalarMappable(cmap="Blues", norm=norm_poisson_3)
     scalarmap_poisson_3.set_clim(poisson_3_min, poisson_3_max)
     scalarmap_poisson_3.set_array([])
-    fcolors_poisson_3 = scalarmap_poisson_3.to_rgba(data_poisson_3)
+    fcolors_poisson_3 = scalarmap_poisson_3.to_rgba(stiffness_matrix.data_poisson_3d[2, :, :])
 
-    axes.plot_surface(data_x_poisson_1, data_y_poisson_1, data_z_poisson_1, facecolors=fcolors_poisson_1, norm=norm_poisson_1,
+    axes.plot_surface(data_xyz_poisson_1[0, :, :], data_xyz_poisson_1[1, :, :], data_xyz_poisson_1[2, :, :], facecolors=fcolors_poisson_1, norm=norm_poisson_1,
                       cmap="Reds", linewidth=0.1, edgecolor = 'k')
-    axes.plot_surface(data_x_poisson_2, data_y_poisson_2, data_z_poisson_2, facecolors=fcolors_poisson_2, norm=norm_poisson_2,
+    axes.plot_surface(data_xyz_poisson_2[0, :, :], data_xyz_poisson_2[1, :, :], data_xyz_poisson_2[2, :, :], facecolors=fcolors_poisson_2, norm=norm_poisson_2,
                       cmap="Greens",
                       alpha=0.5, linewidth=0.1, edgecolor = 'k')
-    axes.plot_surface(data_x_poisson_3, data_y_poisson_3, data_z_poisson_3, facecolors=fcolors_poisson_3, norm=norm_poisson_3, cmap="Blues",
+    axes.plot_surface(data_xyz_poisson_3[0, :, :], data_xyz_poisson_3[1, :, :], data_xyz_poisson_3[2, :, :], facecolors=fcolors_poisson_3, norm=norm_poisson_3, cmap="Blues",
                       alpha=0.5, linewidth=0.1, edgecolor = 'k')
 
     cbar_poisson_1 = plt.colorbar(scalarmap_poisson_1, pad=0.06, orientation="horizontal", shrink=0.6,

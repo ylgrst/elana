@@ -28,6 +28,8 @@ class AbstractStiffnessTensor(ABC):
         self._build_linear_compressibility_3d_plot_data()
         self._build_shear_2d_plot_data()
         self._build_shear_3d_plot_data()
+        self._build_poisson_2d_plot_data()
+        self._build_poisson_3d_plot_data()
 
 
     @abstractmethod
@@ -248,4 +250,31 @@ class AbstractStiffnessTensor(ABC):
         data_shear_3d = {"max": data_shear_max, "min": data_shear_min}
         self.data_shear_3d = data_shear_3d
 
-    
+    def _build_poisson_2d_plot_data(self) -> None:
+        n_points = 100
+
+        theta_array = np.linspace(0.0, np.pi, n_points)
+
+        poisson_xy = list(map(lambda x: self.poisson_2d((np.pi / 2.0, x)), theta_array))
+        poisson_xz = list(map(lambda x: self.poisson_2d((x, 0.0)), theta_array))
+        poisson_yz = list(map(lambda x: self.poisson_2d((x, np.pi / 2.0)), theta_array))
+
+        data_poisson_2d = {"xy": poisson_xy, "xz": poisson_xz, "yz": poisson_yz}
+        self.data_poisson_2d = data_poisson_2d
+
+    def _build_poisson_3d_plot_data(self) -> None:
+        n_points = 50
+
+        theta_array = np.linspace(0.0, np.pi, n_points)
+        phi_array = np.linspace(0.0, np.pi, n_points)
+        phi_plus_pi_array = [phi_array[i] + np.pi for i in range(1, len(phi_array))]
+        phi_array = np.append(phi_array, phi_plus_pi_array)
+
+        data_poisson_3d = np.zeros((3, n_points, 2 * n_points))
+
+        for index_theta in range(len(theta_array)):
+            for index_phi in range(len(phi_array)):
+                poisson = self.poisson_3d((theta_array[index_theta], phi_array[index_phi]))
+                data_poisson_3d[0, index_theta, index_phi], data_poisson_3d[1, index_theta, index_phi], data_poisson_3d[2, index_theta, index_phi] = poisson[0], poisson[1], poisson[2]
+
+        self.data_poisson_3d = data_poisson_3d
