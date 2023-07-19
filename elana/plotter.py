@@ -455,3 +455,13 @@ def plot_poisson_3d(stiffness_matrix: AbstractStiffnessTensor, output_png_name="
 
     plt.savefig(output_png_name)
     plt.show()
+
+def plot_all(stiffness_matrix: AbstractStiffnessTensor) -> None:
+    plot_young_2d(stiffness_matrix)
+    plot_young_3d(stiffness_matrix)
+    plot_linear_compressibility_2d(stiffness_matrix)
+    plot_linear_compressibility_3d(stiffness_matrix)
+    plot_shear_modulus_2d(stiffness_matrix)
+    plot_shear_modulus_3d(stiffness_matrix)
+    plot_poisson_2d(stiffness_matrix)
+    plot_poisson_3d(stiffness_matrix)
