@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 from matplotlib import cm, colors
 from elana.operations import make_planar_plot_data
 
-def plot_young_2d(stiffness_matrix: AbstractStiffnessTensor) -> None:
+def plot_young_2d(stiffness_matrix: AbstractStiffnessTensor, output_png_name="planar_young.png") -> None:
     """2D plotter for Young modulus"""
     n_points = 100
 
@@ -31,11 +31,11 @@ def plot_young_2d(stiffness_matrix: AbstractStiffnessTensor) -> None:
     ax_yz.grid()
     ax_yz.set_title("Young modulus on (yz) plane")
 
-    plt.savefig("planar_young.png")
+    plt.savefig(output_png_name)
     plt.show()
 
 
-def plot_young_3d(stiffness_matrix: AbstractStiffnessTensor) -> None:
+def plot_young_3d(stiffness_matrix: AbstractStiffnessTensor, output_png_name="directional_young.png") -> None:
     """3D plotter for Young modulus"""
 
     n_points = 200
@@ -81,11 +81,11 @@ def plot_young_3d(stiffness_matrix: AbstractStiffnessTensor) -> None:
     axes.azim = 30
     axes.elev = 30
 
-    plt.savefig("directional_young.png")
+    plt.savefig(output_png_name)
     plt.show()
 
 
-def plot_linear_compressibility_2d(stiffness_matrix: AbstractStiffnessTensor) -> None:
+def plot_linear_compressibility_2d(stiffness_matrix: AbstractStiffnessTensor, output_png_name="planar_linear_compressibility.png") -> None:
     """2D plotter for linear compressibility modulus"""
 
     n_points = 100
@@ -120,11 +120,11 @@ def plot_linear_compressibility_2d(stiffness_matrix: AbstractStiffnessTensor) ->
     ax_yz.grid()
     ax_yz.set_title("Linear compressibility on (yz) plane")
 
-    plt.savefig("planar_linear_compressibility.png")
+    plt.savefig(output_png_name)
     plt.show()
 
 
-def plot_linear_compressibility_3d(stiffness_matrix: AbstractStiffnessTensor) -> None:
+def plot_linear_compressibility_3d(stiffness_matrix: AbstractStiffnessTensor, output_png_name="directional_linear_compressibility.png") -> None:
     """3D plotter for linear compressibility modulus"""
 
     n_points = 200
@@ -193,11 +193,11 @@ def plot_linear_compressibility_3d(stiffness_matrix: AbstractStiffnessTensor) ->
     axes.azim = 30
     axes.elev = 30
 
-    plt.savefig("directional_linear_compressibility.png")
+    plt.savefig(output_png_name)
     plt.show()
 
 
-def plot_shear_modulus_2d(stiffness_matrix: AbstractStiffnessTensor) -> None:
+def plot_shear_modulus_2d(stiffness_matrix: AbstractStiffnessTensor, output_png_name="planar_shear_modulus.png") -> None:
     """2D plotter for shear modulus"""
 
     n_points = 100
@@ -239,11 +239,11 @@ def plot_shear_modulus_2d(stiffness_matrix: AbstractStiffnessTensor) -> None:
     ax_yz.grid()
     ax_yz.set_title("Shear modulus on (yz) plane")
 
-    plt.savefig("planar_shear_modulus.png")
+    plt.savefig(output_png_name)
     plt.show()
 
 
-def plot_shear_modulus_3d(stiffness_matrix: AbstractStiffnessTensor) -> None:
+def plot_shear_modulus_3d(stiffness_matrix: AbstractStiffnessTensor, output_png_name="directional_shear_modulus.png") -> None:
     """3D plotter for shear modulus"""
 
     n_points = 100
@@ -312,11 +312,11 @@ def plot_shear_modulus_3d(stiffness_matrix: AbstractStiffnessTensor) -> None:
     axes.azim = 30
     axes.elev = 30
 
-    plt.savefig("directional_shear_modulus.png")
+    plt.savefig(output_png_name)
     plt.show()
 
 
-def plot_poisson_2d(stiffness_matrix: AbstractStiffnessTensor) -> None:
+def plot_poisson_2d(stiffness_matrix: AbstractStiffnessTensor, output_png_name="planar_poisson_coefficient.png") -> None:
     """2D plotter for Poisson coefficient"""
 
     n_points = 100
@@ -353,11 +353,11 @@ def plot_poisson_2d(stiffness_matrix: AbstractStiffnessTensor) -> None:
     ax_yz.set_title("Poisson coefficient on (yz) plane")
     plt.grid()
 
-    plt.savefig("planar_poisson_coefficient.png")
+    plt.savefig(output_png_name)
     plt.show()
 
 
-def plot_poisson_3d(stiffness_matrix: AbstractStiffnessTensor) -> None:
+def plot_poisson_3d(stiffness_matrix: AbstractStiffnessTensor, output_png_name="directional_poisson_coefficient.png") -> None:
     """3D plotter for Poisson coefficient"""
 
     n_points = 50
@@ -453,5 +453,5 @@ def plot_poisson_3d(stiffness_matrix: AbstractStiffnessTensor) -> None:
     axes.azim = 30
     axes.elev = 30
 
-    plt.savefig("directional_poisson_coefficient.png")
+    plt.savefig(output_png_name)
     plt.show()
