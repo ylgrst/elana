@@ -32,7 +32,6 @@ def plot_young_2d(stiffness_matrix: AbstractStiffnessTensor, output_png_name="pl
     ax_yz.set_title("Young modulus on (yz) plane")
 
     plt.savefig(output_png_name)
-    plt.show()
 
 
 def plot_young_3d(stiffness_matrix: AbstractStiffnessTensor, output_png_name="directional_young.png") -> None:
@@ -82,7 +81,6 @@ def plot_young_3d(stiffness_matrix: AbstractStiffnessTensor, output_png_name="di
     axes.elev = 30
 
     plt.savefig(output_png_name)
-    plt.show()
 
 
 def plot_linear_compressibility_2d(stiffness_matrix: AbstractStiffnessTensor, output_png_name="planar_linear_compressibility.png") -> None:
@@ -121,7 +119,6 @@ def plot_linear_compressibility_2d(stiffness_matrix: AbstractStiffnessTensor, ou
     ax_yz.set_title("Linear compressibility on (yz) plane")
 
     plt.savefig(output_png_name)
-    plt.show()
 
 
 def plot_linear_compressibility_3d(stiffness_matrix: AbstractStiffnessTensor, output_png_name="directional_linear_compressibility.png") -> None:
@@ -194,7 +191,6 @@ def plot_linear_compressibility_3d(stiffness_matrix: AbstractStiffnessTensor, ou
     axes.elev = 30
 
     plt.savefig(output_png_name)
-    plt.show()
 
 
 def plot_shear_modulus_2d(stiffness_matrix: AbstractStiffnessTensor, output_png_name="planar_shear_modulus.png") -> None:
@@ -240,7 +236,6 @@ def plot_shear_modulus_2d(stiffness_matrix: AbstractStiffnessTensor, output_png_
     ax_yz.set_title("Shear modulus on (yz) plane")
 
     plt.savefig(output_png_name)
-    plt.show()
 
 
 def plot_shear_modulus_3d(stiffness_matrix: AbstractStiffnessTensor, output_png_name="directional_shear_modulus.png") -> None:
@@ -313,7 +308,6 @@ def plot_shear_modulus_3d(stiffness_matrix: AbstractStiffnessTensor, output_png_
     axes.elev = 30
 
     plt.savefig(output_png_name)
-    plt.show()
 
 
 def plot_poisson_2d(stiffness_matrix: AbstractStiffnessTensor, output_png_name="planar_poisson_coefficient.png") -> None:
@@ -354,7 +348,6 @@ def plot_poisson_2d(stiffness_matrix: AbstractStiffnessTensor, output_png_name="
     plt.grid()
 
     plt.savefig(output_png_name)
-    plt.show()
 
 
 def plot_poisson_3d(stiffness_matrix: AbstractStiffnessTensor, output_png_name="directional_poisson_coefficient.png") -> None:
@@ -454,7 +447,6 @@ def plot_poisson_3d(stiffness_matrix: AbstractStiffnessTensor, output_png_name="
     axes.elev = 30
 
     plt.savefig(output_png_name)
-    plt.show()
 
 def plot_all(stiffness_matrix: AbstractStiffnessTensor) -> None:
     plot_young_2d(stiffness_matrix)
