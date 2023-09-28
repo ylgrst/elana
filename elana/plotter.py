@@ -32,7 +32,6 @@ def plot_young_2d(stiffness_matrix: AbstractStiffnessTensor, output_png_name="pl
     ax_yz.set_title("Young modulus on (yz) plane")
 
     plt.savefig(output_png_name)
-    plt.show()
 
 
 def plot_young_3d(stiffness_matrix: AbstractStiffnessTensor, output_png_name="directional_young.png") -> None:
@@ -73,7 +72,7 @@ def plot_young_3d(stiffness_matrix: AbstractStiffnessTensor, output_png_name="di
     fcolors = scalarmap.to_rgba(stiffness_matrix.data_young_3d)
 
 
-    cbar = plt.colorbar(scalarmap, orientation="horizontal", fraction=0.05, pad=0.1,
+    cbar = plt.colorbar(scalarmap, ax=axes, orientation="horizontal", fraction=0.05, pad=0.1,
                         ticks=[young_3d_min, young_3d_average, young_3d_max])
     cbar.ax.tick_params(labelsize='large')
 
@@ -82,7 +81,6 @@ def plot_young_3d(stiffness_matrix: AbstractStiffnessTensor, output_png_name="di
     axes.elev = 30
 
     plt.savefig(output_png_name)
-    plt.show()
 
 
 def plot_linear_compressibility_2d(stiffness_matrix: AbstractStiffnessTensor, output_png_name="planar_linear_compressibility.png") -> None:
@@ -121,7 +119,6 @@ def plot_linear_compressibility_2d(stiffness_matrix: AbstractStiffnessTensor, ou
     ax_yz.set_title("Linear compressibility on (yz) plane")
 
     plt.savefig(output_png_name)
-    plt.show()
 
 
 def plot_linear_compressibility_3d(stiffness_matrix: AbstractStiffnessTensor, output_png_name="directional_linear_compressibility.png") -> None:
@@ -174,7 +171,7 @@ def plot_linear_compressibility_3d(stiffness_matrix: AbstractStiffnessTensor, ou
     scalarmap_pos.set_array([])
     fcolors_pos = scalarmap_pos.to_rgba(stiffness_matrix.data_linear_compressibility_3d["pos"])
 
-    cbar_pos = plt.colorbar(scalarmap_pos, orientation="horizontal", pad=0.05, shrink=0.6,
+    cbar_pos = plt.colorbar(scalarmap_pos,  ax=axes, orientation="horizontal", pad=0.05, shrink=0.6,
                         ticks=[linear_compressibility_pos_min, linear_compressibility_pos_max])
     cbar_pos.ax.tick_params(labelsize='large')
 
@@ -183,7 +180,7 @@ def plot_linear_compressibility_3d(stiffness_matrix: AbstractStiffnessTensor, ou
     scalarmap_neg.set_array([])
     fcolors_neg = scalarmap_neg.to_rgba(stiffness_matrix.data_linear_compressibility_3d["neg"])
 
-    cbar_neg = plt.colorbar(scalarmap_neg, orientation="horizontal", pad=0.08, shrink=0.6,
+    cbar_neg = plt.colorbar(scalarmap_neg,  ax=axes, orientation="horizontal", pad=0.08, shrink=0.6,
                         ticks=[linear_compressibility_neg_min, linear_compressibility_neg_max])
     cbar_neg.ax.tick_params(labelsize='large')
 
@@ -194,7 +191,6 @@ def plot_linear_compressibility_3d(stiffness_matrix: AbstractStiffnessTensor, ou
     axes.elev = 30
 
     plt.savefig(output_png_name)
-    plt.show()
 
 
 def plot_shear_modulus_2d(stiffness_matrix: AbstractStiffnessTensor, output_png_name="planar_shear_modulus.png") -> None:
@@ -240,7 +236,6 @@ def plot_shear_modulus_2d(stiffness_matrix: AbstractStiffnessTensor, output_png_
     ax_yz.set_title("Shear modulus on (yz) plane")
 
     plt.savefig(output_png_name)
-    plt.show()
 
 
 def plot_shear_modulus_3d(stiffness_matrix: AbstractStiffnessTensor, output_png_name="directional_shear_modulus.png") -> None:
@@ -301,11 +296,11 @@ def plot_shear_modulus_3d(stiffness_matrix: AbstractStiffnessTensor, output_png_
     axes.plot_surface(data_xyz_shear_max[0,:,:], data_xyz_shear_max[1,:,:], data_xyz_shear_max[2,:,:], facecolors=fcolors_shear_max, norm=norm_max, cmap="Blues", linewidth=0.05, edgecolor = 'k',
                       alpha=0.5)
 
-    cbar_min = plt.colorbar(scalarmap_shear_min, orientation="horizontal", pad=0.05, shrink=0.6,
+    cbar_min = plt.colorbar(scalarmap_shear_min,  ax=axes, orientation="horizontal", pad=0.05, shrink=0.6,
                             ticks=[shear_min_min, shear_min_average, shear_min_max])
     cbar_min.ax.tick_params(labelsize='large')
 
-    cbar_max = plt.colorbar(scalarmap_shear_max, orientation="horizontal", pad=0.08, shrink=0.6,
+    cbar_max = plt.colorbar(scalarmap_shear_max,  ax=axes, orientation="horizontal", pad=0.08, shrink=0.6,
                             ticks=[shear_max_min, shear_max_average, shear_max_max])
     cbar_max.ax.tick_params(labelsize='large')
 
@@ -313,7 +308,6 @@ def plot_shear_modulus_3d(stiffness_matrix: AbstractStiffnessTensor, output_png_
     axes.elev = 30
 
     plt.savefig(output_png_name)
-    plt.show()
 
 
 def plot_poisson_2d(stiffness_matrix: AbstractStiffnessTensor, output_png_name="planar_poisson_coefficient.png") -> None:
@@ -354,7 +348,6 @@ def plot_poisson_2d(stiffness_matrix: AbstractStiffnessTensor, output_png_name="
     plt.grid()
 
     plt.savefig(output_png_name)
-    plt.show()
 
 
 def plot_poisson_3d(stiffness_matrix: AbstractStiffnessTensor, output_png_name="directional_poisson_coefficient.png") -> None:
@@ -438,15 +431,15 @@ def plot_poisson_3d(stiffness_matrix: AbstractStiffnessTensor, output_png_name="
     axes.plot_surface(data_xyz_poisson_3[0, :, :], data_xyz_poisson_3[1, :, :], data_xyz_poisson_3[2, :, :], facecolors=fcolors_poisson_3, norm=norm_poisson_3, cmap="Blues",
                       alpha=0.5, linewidth=0.1, edgecolor = 'k')
 
-    cbar_poisson_1 = plt.colorbar(scalarmap_poisson_1, pad=0.06, orientation="horizontal", shrink=0.6,
+    cbar_poisson_1 = plt.colorbar(scalarmap_poisson_1,  ax=axes, pad=0.06, orientation="horizontal", shrink=0.6,
                                   ticks=[poisson_1_min, poisson_1_average, poisson_1_max])
     cbar_poisson_1.ax.tick_params(labelsize='large')
 
-    cbar_poisson_2 = plt.colorbar(scalarmap_poisson_2, pad=0.07, orientation="horizontal", shrink=0.6,
+    cbar_poisson_2 = plt.colorbar(scalarmap_poisson_2,  ax=axes, pad=0.07, orientation="horizontal", shrink=0.6,
                                   ticks=[poisson_2_min, poisson_2_average, poisson_2_max])
     cbar_poisson_2.ax.tick_params(labelsize='large')
 
-    cbar_poisson_3 = plt.colorbar(scalarmap_poisson_3, pad=0.075, orientation="horizontal", shrink=0.6,
+    cbar_poisson_3 = plt.colorbar(scalarmap_poisson_3,  ax=axes, pad=0.075, orientation="horizontal", shrink=0.6,
                                   ticks=[poisson_3_min, poisson_3_average, poisson_3_max])
     cbar_poisson_3.ax.tick_params(labelsize='large')
 
@@ -454,7 +447,6 @@ def plot_poisson_3d(stiffness_matrix: AbstractStiffnessTensor, output_png_name="
     axes.elev = 30
 
     plt.savefig(output_png_name)
-    plt.show()
 
 def plot_all(stiffness_matrix: AbstractStiffnessTensor) -> None:
     plot_young_2d(stiffness_matrix)
