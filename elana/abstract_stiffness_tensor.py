@@ -48,6 +48,13 @@ class AbstractStiffnessTensor(ABC):
     def poisson(self, angles: tuple[float, float, float]) -> float:
         pass
 
+    def young_xyz(self) -> tuple[float, float, float]:
+        young_x = self.young((np.pi/2.0, 0.0))
+        young_y = self.young((np.pi/2.0, np.pi/2.0))
+        young_z = self.young((0.0, np.pi/2.0))
+
+        return young_x, young_y, young_z
+
     def voigt_averages(self) -> list[float]:
         tmpA = (self.matrix[0][0] + self.matrix[1][1] + self.matrix[2][2]) / 3
         tmpB = (self.matrix[1][2] + self.matrix[0][2] + self.matrix[0][1]) / 3
