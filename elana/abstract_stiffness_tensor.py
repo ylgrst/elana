@@ -49,11 +49,13 @@ class AbstractStiffnessTensor(ABC):
         pass
 
     def young_xyz(self) -> tuple[float, float, float]:
-        young_x = self.young((np.pi/2.0, 0.0))
-        young_y = self.young((np.pi/2.0, np.pi/2.0))
-        young_z = self.young((0.0, np.pi/2.0))
+        pass
 
-        return young_x, young_y, young_z
+    def poisson_xyz(self) -> tuple[float, float, float]:
+        pass
+
+    def shear_xyz(self) -> tuple[float, float, float]:
+        pass
 
     def voigt_averages(self) -> list[float]:
         tmpA = (self.matrix[0][0] + self.matrix[1][1] + self.matrix[2][2]) / 3

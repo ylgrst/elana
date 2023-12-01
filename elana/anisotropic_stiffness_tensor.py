@@ -54,4 +54,23 @@ class AnisotropicStiffnessTensor(AbstractStiffnessTensor):
 
         return result_numerator / result_denominator
 
+    def young_xyz(self) -> tuple[float, float, float]:
+        young_x = self.young((np.pi/2.0, 0.0))
+        young_y = self.young((np.pi/2.0, np.pi/2.0))
+        young_z = self.young((0.0, np.pi/2.0))
 
+        return young_x, young_y, young_z
+
+    def poisson_xyz(self) -> tuple[float, float, float]:
+        poisson_xy = self.poisson((np.pi/2.0, 0.0, np.pi/2.0))
+        poisson_yz = self.poisson((np.pi/2.0, np.pi/2.0, 0.0))
+        poisson_xz = self.poisson((np.pi/2.0, 0.0, 0.0))
+
+        return poisson_xy, poisson_yz, poisson_xz
+
+    def shear_xyz(self) -> tuple[float, float, float]:
+        shear_xy = self.shear((np.pi/2.0, 0.0, np.pi/2.0))
+        shear_yz = self.shear((np.pi/2.0, np.pi/2.0, 0.0))
+        shear_xz = self.shear((np.pi/2.0, 0.0, 0.0))
+
+        return shear_xy, shear_yz, shear_xz
