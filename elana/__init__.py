@@ -1,4 +1,4 @@
 from .anisotropic_stiffness_tensor import AnisotropicStiffnessTensor
-from .orthorhombic_stiffness_tensor import Orthorhombic
+from .orthotropic_stiffness_tensor import Orthotropic
 from .operations import *
 from .plotter import *

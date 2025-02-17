@@ -3,6 +3,7 @@ from elana.anisotropic_stiffness_tensor import AnisotropicStiffnessTensor
 from elana.plotter import *
 import numpy as np
 import numpy.typing as npt
+np.float_ = np.float64
 
 @pytest.fixture
 def _reference_trigonal_stiffness_matrix():

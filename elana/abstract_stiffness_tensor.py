@@ -3,6 +3,7 @@ import numpy.typing as npt
 import numpy as np
 from scipy import optimize
 from elana.operations import _compute_4th_order_tensor_from_6x6_matrix
+np.float_ = np.float64
 
 class AbstractStiffnessTensor(ABC):
     def __init__(self,

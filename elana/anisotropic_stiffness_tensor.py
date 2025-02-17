@@ -2,7 +2,7 @@ import numpy as np
 import numpy.typing as npt
 from elana.operations import compute_direction_vector_spherical_to_cartesian
 from elana.abstract_stiffness_tensor import AbstractStiffnessTensor
-
+np.float_ = np.float64
 
 class AnisotropicStiffnessTensor(AbstractStiffnessTensor):
     """

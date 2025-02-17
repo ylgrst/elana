@@ -3,6 +3,7 @@ import math as m
 from typing import Callable
 from scipy import optimize
 import numpy.typing as npt
+np.float_ = np.float64
 
 _VOIGT_MATRIX: npt.NDArray[int] = np.array([[0, 5, 4], [5, 1, 3], [4, 3, 2]])
 
@@ -49,4 +50,13 @@ def make_planar_plot_data(data_x: npt.NDArray[np.float_], data_y: npt.NDArray[np
 
 #TODO Change minimize and maximize to use tuples when calling function to maximize or minimize
 
+def symmetrize_matrix(matrix: npt.NDArray[np.float_]) -> npt.NDArray[np.float_]:
+    """Ensures a nearly symmetrix 6x6 stiffness matrix is symmetric (in case of float value discrepancy)"""
+    for i in range(6):
+        for j in range(i + 1, 6):
+            if np.isclose(matrix[i,j], matrix[j,i]):
+                matrix[j,i] = matrix[i,j]
+            else:
+                raise ValueError("Stiffness matrix cannot be symmetrized")
 
+    return matrix
