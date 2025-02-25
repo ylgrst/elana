@@ -1,7 +1,7 @@
 import numpy as np
 import math as m
 from typing import Callable
-from scipy import optimize
+from scipy.optimize import brute, fmin
 import numpy.typing as npt
 np.float_ = np.float64
 

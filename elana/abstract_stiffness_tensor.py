@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 import numpy.typing as npt
 import numpy as np
-from scipy import optimize
+from scipy.optimize import minimize
 from elana.operations import _compute_4th_order_tensor_from_6x6_matrix
 np.float_ = np.float64
 
@@ -99,9 +99,9 @@ class AbstractStiffnessTensor(ABC):
 
         def minus_shear_function(z): return -self.shear((angles[0], angles[1], z))
 
-        result_pos = optimize.minimize(shear_function, np.pi / 2.0, args=(), method='Powell',
+        result_pos = minimize(shear_function, np.pi / 2.0, args=(), method='Powell',
                                        options={"xtol": xtol, "ftol": ftol})  # , bounds=[(0.0,np.pi)])
-        result_neg = optimize.minimize(minus_shear_function, np.pi / 2.0, args=(), method='Powell',
+        result_neg = minimize(minus_shear_function, np.pi / 2.0, args=(), method='Powell',
                                        options={"xtol": xtol, "ftol": ftol})  # , bounds=[(0.0,np.pi)])
         return float(result_pos.fun), -float(result_neg.fun)
 
@@ -113,9 +113,9 @@ class AbstractStiffnessTensor(ABC):
 
         def minus_shear_function(z): return -self.shear((angles[0], angles[1], z))
 
-        result_pos = optimize.minimize(shear_function, guess, args=(), method='COBYLA',
+        result_pos = minimize(shear_function, guess, args=(), method='COBYLA',
                                        options={"tol": tol})  # , bounds=[(0.0,np.pi)])
-        result_neg = optimize.minimize(minus_shear_function, guess, args=(), method='COBYLA',
+        result_neg = minimize(minus_shear_function, guess, args=(), method='COBYLA',
                                        options={"tol": tol})  # , bounds=[(0.0,np.pi)])
 
         return float(result_pos.fun), -float(result_neg.fun), float(result_pos.x), float(result_neg.x)
@@ -128,9 +128,9 @@ class AbstractStiffnessTensor(ABC):
 
         def minus_poisson_function(z): return -self.poisson((angles[0], angles[1], z))
 
-        result_pos = optimize.minimize(poisson_function, np.pi / 2.0, args=(), method='Powell',
+        result_pos = minimize(poisson_function, np.pi / 2.0, args=(), method='Powell',
                                        options={"xtol": xtol, "ftol": ftol})  # , bounds=[(0.0,np.pi)])
-        result_neg = optimize.minimize(minus_poisson_function, np.pi / 2.0, args=(), method='Powell',
+        result_neg = minimize(minus_poisson_function, np.pi / 2.0, args=(), method='Powell',
                                        options={"xtol": xtol, "ftol": ftol})  # , bounds=[(0.0,np.pi)])
         return min(0.0, float(result_pos.fun)), max(0.0, float(result_pos.fun)), -float(result_neg.fun)
 
@@ -142,9 +142,9 @@ class AbstractStiffnessTensor(ABC):
 
         def minus_poisson_function(z): return -self.poisson((angles[0], angles[1], z))
 
-        result_pos = optimize.minimize(poisson_function, guess, args=(), method='COBYLA',
+        result_pos = minimize(poisson_function, guess, args=(), method='COBYLA',
                                        options={"tol": tol})  # , bounds=[(0.0,np.pi)])
-        result_neg = optimize.minimize(minus_poisson_function, guess, args=(), method='COBYLA',
+        result_neg = minimize(minus_poisson_function, guess, args=(), method='COBYLA',
                                        options={"tol": tol})  # , bounds=[(0.0,np.pi)])
 
         return min(0.0, float(result_pos.fun)), max(0.0, float(result_pos.fun)), -float(result_neg.fun), float(
